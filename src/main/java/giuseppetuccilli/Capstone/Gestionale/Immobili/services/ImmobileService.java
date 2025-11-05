@@ -38,40 +38,7 @@ public class ImmobileService {
         }
     }
 
-    public Page<Immobile> findAll(int pageNumber, int pageSize, String sortBy) {
-        if (pageSize > 20) pageSize = 20;
-        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).ascending());
-        return this.immRepo.findAll(pageable);
-    }
-
-    public Immobile salvaImmobile(NewImmoPayload payload) {
-        MacroTipologiaImmobile macTipo;
-        switch (payload.macroTipo().toLowerCase()) {
-            case "destinazione ordinaria":
-                macTipo = MacroTipologiaImmobile.DESTINAZIONE_ORDINARIA;
-                break;
-            case "destinazione speciale":
-                macTipo = MacroTipologiaImmobile.DESTINAZIONE_SPECIALE;
-                break;
-            case "destinazione particolare":
-                macTipo = MacroTipologiaImmobile.DESTINAZIONE_PARTICOLARE;
-                break;
-            case "entità urbana":
-                macTipo = MacroTipologiaImmobile.ENTITÀ_URBANA;
-                break;
-            default:
-                throw new BadRequestException("macro tipologia non valida");
-
-        }
-
-        Immobile im = new Immobile(macTipo, payload.superficie(), payload.locali(),
-                payload.vani(), payload.descrizione(), payload.prezzo(), payload.cantina(),
-                payload.ascensore(), payload.postoAuto(), payload.giardinoPrivato(), payload.terrazzo(),
-                payload.arredato(), payload.indirizzo(), payload.comune(), payload.provincia());
-
-        Immobile imFromDb = immRepo.save(im);
-
-
+    private void salvaIncroci(Immobile imFromDb) {
         List<Richiesta> richieste = richiestaRepo.findAll();
         if (!richieste.isEmpty()) {
             for (int i = 0; i < richieste.size(); i++) {
@@ -130,8 +97,128 @@ public class ImmobileService {
 
             }
         }
+    }
+
+    public Page<Immobile> findAll(int pageNumber, int pageSize, String sortBy) {
+        if (pageSize > 20) pageSize = 20;
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).ascending());
+        return this.immRepo.findAll(pageable);
+    }
+
+    public Immobile salvaImmobile(NewImmoPayload payload) {
+        MacroTipologiaImmobile macTipo;
+        switch (payload.macroTipo().toLowerCase()) {
+            case "destinazione ordinaria":
+                macTipo = MacroTipologiaImmobile.DESTINAZIONE_ORDINARIA;
+                break;
+            case "destinazione_ordinaria":
+                macTipo = MacroTipologiaImmobile.DESTINAZIONE_ORDINARIA;
+                break;
+            case "destinazione speciale":
+                macTipo = MacroTipologiaImmobile.DESTINAZIONE_SPECIALE;
+                break;
+            case "destinazione_speciale":
+                macTipo = MacroTipologiaImmobile.DESTINAZIONE_SPECIALE;
+                break;
+            case "destinazione particolare":
+                macTipo = MacroTipologiaImmobile.DESTINAZIONE_PARTICOLARE;
+                break;
+            case "destinazione_particolare":
+                macTipo = MacroTipologiaImmobile.DESTINAZIONE_PARTICOLARE;
+                break;
+            case "entità urbana":
+                macTipo = MacroTipologiaImmobile.ENTITÀ_URBANA;
+                break;
+            case "entità_urbana":
+                macTipo = MacroTipologiaImmobile.ENTITÀ_URBANA;
+                break;
+            case "entita urbana":
+                macTipo = MacroTipologiaImmobile.ENTITÀ_URBANA;
+                break;
+            case "entita_urbana":
+                macTipo = MacroTipologiaImmobile.ENTITÀ_URBANA;
+                break;
+            default:
+                throw new BadRequestException("macro tipologia non valida");
+
+        }
+
+        Immobile im = new Immobile(macTipo, payload.superficie(), payload.locali(),
+                payload.vani(), payload.descrizione(), payload.prezzo(), payload.cantina(),
+                payload.ascensore(), payload.postoAuto(), payload.giardinoPrivato(), payload.terrazzo(),
+                payload.arredato(), payload.indirizzo(), payload.comune(), payload.provincia());
+
+        Immobile imFromDb = immRepo.save(im);
+
+        this.salvaIncroci(imFromDb);
 
         return imFromDb;
+
+    }
+
+    public Immobile modificaImmobile(NewImmoPayload payload, long imId) {
+        Immobile found = this.findById(imId);
+        MacroTipologiaImmobile macTipo;
+        switch (payload.macroTipo().toLowerCase()) {
+            case "destinazione ordinaria":
+                macTipo = MacroTipologiaImmobile.DESTINAZIONE_ORDINARIA;
+                break;
+            case "destinazione_ordinaria":
+                macTipo = MacroTipologiaImmobile.DESTINAZIONE_ORDINARIA;
+                break;
+            case "destinazione speciale":
+                macTipo = MacroTipologiaImmobile.DESTINAZIONE_SPECIALE;
+                break;
+            case "destinazione_speciale":
+                macTipo = MacroTipologiaImmobile.DESTINAZIONE_SPECIALE;
+                break;
+            case "destinazione particolare":
+                macTipo = MacroTipologiaImmobile.DESTINAZIONE_PARTICOLARE;
+                break;
+            case "destinazione_particolare":
+                macTipo = MacroTipologiaImmobile.DESTINAZIONE_PARTICOLARE;
+                break;
+            case "entità urbana":
+                macTipo = MacroTipologiaImmobile.ENTITÀ_URBANA;
+                break;
+            case "entità_urbana":
+                macTipo = MacroTipologiaImmobile.ENTITÀ_URBANA;
+                break;
+            case "entita urbana":
+                macTipo = MacroTipologiaImmobile.ENTITÀ_URBANA;
+                break;
+            case "entita_urbana":
+                macTipo = MacroTipologiaImmobile.ENTITÀ_URBANA;
+                break;
+            default:
+                throw new BadRequestException("macro tipologia non valida");
+
+        }
+
+        found.setSuperficie(payload.superficie());
+        found.setLocali((payload.locali()));
+        found.setVani(payload.vani());
+        found.setDescrizione(payload.descrizione());
+        found.setPrezzo(payload.prezzo());
+        found.setIndirizzo(payload.indirizzo());
+        found.setComune(payload.comune());
+        found.setProvincia(payload.provincia());
+        found.setCantina(payload.cantina());
+        found.setAscensore(payload.ascensore());
+        found.setPostoAuto(payload.postoAuto());
+        found.setGiardinoPrivato(payload.giardinoPrivato());
+        found.setTerrazzo(payload.terrazzo());
+        found.setArredato(payload.arredato());
+
+        Immobile im = immRepo.save(found);
+        List<Incrocio> incrociPrec = incrocioRepo.findByImmobile(im);
+        if (!incrociPrec.isEmpty()) {
+            for (int i = 0; i < incrociPrec.size(); i++) {
+                incrocioRepo.delete(incrociPrec.get(i));
+            }
+        }
+        this.salvaIncroci(im);
+        return im;
 
     }
 
