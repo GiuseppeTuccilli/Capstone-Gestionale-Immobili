@@ -207,7 +207,7 @@ public class ImmobileService {
         }
 
         found.setSuperficie(payload.superficie());
-        found.setLocali((payload.locali()));
+        found.setLocali(payload.locali());
         found.setVani(payload.vani());
         found.setDescrizione(payload.descrizione());
         found.setPrezzo(payload.prezzo());
