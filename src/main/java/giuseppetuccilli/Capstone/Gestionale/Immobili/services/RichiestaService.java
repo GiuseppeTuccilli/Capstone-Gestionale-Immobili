@@ -46,22 +46,7 @@ public class RichiestaService {
         return this.richiestaRepo.findAll(pageable);
     }
 
-    public Richiesta salvaRichiesta(NewRichiestaPayload payload, long idCliente) {
-        Optional<Cliente> clienteFound = clienteRepo.findById(idCliente);
-        Cliente c;
-        if (clienteFound.isPresent()) {
-            c = clienteFound.get();
-        } else {
-            throw new NotFoundException(idCliente);
-        }
-        Richiesta ric = new Richiesta(payload.prezzoMassimo(), payload.superficieMinimo(),
-                payload.superficieMassimo(), payload.vaniMinimo(), payload.vaniMassimo(),
-                payload.localiMinimo(), payload.localiMassimo(), payload.cantina(), payload.ascensore(),
-                payload.postoAuto(), payload.giardinoPrivato(), payload.terrazzo(), payload.arredato(),
-                payload.comune(), payload.provincia(), c);
-
-        Richiesta r = richiestaRepo.save(ric);
-
+    public void salvaIncroci(Richiesta r) {
         List<Immobile> immobili = immobileRepo.findAll();
         if (!immobili.isEmpty()) {
             for (int i = 0; i < immobili.size(); i++) {
@@ -119,7 +104,57 @@ public class RichiestaService {
                 }
             }
         }
+
+    }
+
+    public Richiesta salvaRichiesta(NewRichiestaPayload payload, long idCliente) {
+        Optional<Cliente> clienteFound = clienteRepo.findById(idCliente);
+        Cliente c;
+        if (clienteFound.isPresent()) {
+            c = clienteFound.get();
+        } else {
+            throw new NotFoundException(idCliente);
+        }
+        Richiesta ric = new Richiesta(payload.prezzoMassimo(), payload.superficieMinimo(),
+                payload.superficieMassimo(), payload.vaniMinimo(), payload.vaniMassimo(),
+                payload.localiMinimo(), payload.localiMassimo(), payload.cantina(), payload.ascensore(),
+                payload.postoAuto(), payload.giardinoPrivato(), payload.terrazzo(), payload.arredato(),
+                payload.comune(), payload.provincia(), c);
+
+        Richiesta r = richiestaRepo.save(ric);
+        this.salvaIncroci(r);
         return r;
+    }
+
+    public Richiesta modificaRichiesta(NewRichiestaPayload payload, long idRic) {
+        Richiesta found = this.findById(idRic);
+        //cancellazione incroci
+        List<Incrocio> incroci = incrocioRepo.findByRichiesta(found);
+        if (!incroci.isEmpty()) {
+            for (int i = 0; i < incroci.size(); i++) {
+                incrocioRepo.delete(incroci.get(i));
+            }
+        }
+
+        found.setPrezzoMassimo(payload.prezzoMassimo());
+        found.setSuperficieMassimo(payload.superficieMassimo());
+        found.setSuperficieMinimo(payload.superficieMinimo());
+        found.setVaniMinimo(payload.vaniMinimo());
+        found.setVaniMassimo(payload.vaniMassimo());
+        found.setLocaliMinimo(payload.localiMinimo());
+        found.setLocaliMassimo(payload.localiMassimo());
+        found.setComune(payload.comune());
+        found.setProvincia(payload.provincia());
+        found.setCantina(payload.cantina());
+        found.setAscensore(payload.ascensore());
+        found.setPostoAuto(payload.postoAuto());
+        found.setGiardinoPrivato(payload.giardinoPrivato());
+        found.setTerrazzo(payload.terrazzo());
+        found.setArredato(payload.arredato());
+
+        Richiesta ric = richiestaRepo.save(found);
+        this.salvaIncroci(ric);
+        return ric;
     }
 
     public void cancellaRichiesta(long id) {
