@@ -7,6 +7,10 @@ import giuseppetuccilli.Capstone.Gestionale.Immobili.exceptions.NotFoundExceptio
 import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.NewImmoPayload;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.ImmobileRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -23,6 +27,12 @@ public class ImmobileService {
         } else {
             throw new NotFoundException(id);
         }
+    }
+
+    public Page<Immobile> findAll(int pageNumber, int pageSize, String sortBy) {
+        if (pageSize > 50) pageSize = 50;
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).ascending());
+        return this.immRepo.findAll(pageable);
     }
 
     public Immobile salvaImmobile(NewImmoPayload payload) {
@@ -53,6 +63,13 @@ public class ImmobileService {
         immRepo.save(im);
         return im;
 
+    }
+
+    
+    //foto immobile
+    public void cancellaImmobile(long id) {
+        Immobile found = this.findById(id);
+        immRepo.delete(found);
     }
 
 

@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Entity
 @Table(name = "immobili")
 @NoArgsConstructor
@@ -33,6 +35,9 @@ public class Immobile {
     private String indirizzo;
     private String comune;
     private String Provincia;
+
+    @OneToMany(mappedBy = "immobile")
+    private List<FotoImmobile> foto;
 
     public Immobile(MacroTipologiaImmobile macroTipologia, double superficie, int locali, int vani,
                     String descrizione, double prezzo, boolean cantina, boolean ascensore,
