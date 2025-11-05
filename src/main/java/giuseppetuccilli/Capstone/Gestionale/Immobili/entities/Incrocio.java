@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Getter
 public class Incrocio {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @ManyToOne

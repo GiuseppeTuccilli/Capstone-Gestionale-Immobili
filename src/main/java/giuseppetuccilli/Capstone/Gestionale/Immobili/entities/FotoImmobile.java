@@ -13,7 +13,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class FotoImmobile {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Setter(AccessLevel.NONE)
     private long id;
     private String urlFoto;

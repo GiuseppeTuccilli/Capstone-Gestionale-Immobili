@@ -1,9 +1,6 @@
 package giuseppetuccilli.Capstone.Gestionale.Immobili.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,7 +13,7 @@ import lombok.Setter;
 @Setter
 public class Richiesta {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Setter(AccessLevel.NONE)
     private long id;
     private double prezzoMassimo;
@@ -35,12 +32,16 @@ public class Richiesta {
     private String comune;
     private String provincia;
 
-    public Richiesta(double superficieMinimo, double prezzoMassimo, double superficieMassimo,
+    @ManyToOne
+    @JoinColumn(name = "id_cliente")
+    private Cliente cliente;
+
+    public Richiesta(double prezzoMassimo, double superficieMinimo, double superficieMassimo,
                      int vaniMinimo, int vaniMassimo, int localiMinimo, int localiMassimo,
                      boolean cantina, boolean ascensore, boolean postoAuto, boolean giardinoPrivato,
-                     boolean terrazzo, boolean arredato, String comune, String provincia) {
-        this.superficieMinimo = superficieMinimo;
+                     boolean terrazzo, boolean arredato, String comune, String provincia, Cliente cliente) {
         this.prezzoMassimo = prezzoMassimo;
+        this.superficieMinimo = superficieMinimo;
         this.superficieMassimo = superficieMassimo;
         this.vaniMinimo = vaniMinimo;
         this.vaniMassimo = vaniMassimo;
@@ -54,5 +55,6 @@ public class Richiesta {
         this.arredato = arredato;
         this.comune = comune;
         this.provincia = provincia;
+        this.cliente = cliente;
     }
 }
