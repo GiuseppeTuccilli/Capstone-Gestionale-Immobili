@@ -1,5 +1,6 @@
 package giuseppetuccilli.Capstone.Gestionale.Immobili.services;
 
+import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.FotoImmobile;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Immobile;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Incrocio;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Richiesta;
@@ -7,6 +8,7 @@ import giuseppetuccilli.Capstone.Gestionale.Immobili.enums.MacroTipologiaImmobil
 import giuseppetuccilli.Capstone.Gestionale.Immobili.exceptions.BadRequestException;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.exceptions.NotFoundException;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.NewImmoPayload;
+import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.FotoImmobileRepo;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.ImmobileRepo;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.IncrocioRepo;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.RichiestaRepo;
@@ -28,6 +30,8 @@ public class ImmobileService {
     private RichiestaRepo richiestaRepo;
     @Autowired
     private IncrocioRepo incrocioRepo;
+    @Autowired
+    private FotoImmobileRepo fotoImmobileRepo;
 
     public Immobile findById(long id) {
         Optional<Immobile> found = immRepo.findById(id);
@@ -232,6 +236,13 @@ public class ImmobileService {
         if (!incrociPrec.isEmpty()) {
             for (int i = 0; i < incrociPrec.size(); i++) {
                 incrocioRepo.delete(incrociPrec.get(i));
+            }
+        }
+        //cancellazione foto
+        List<FotoImmobile> fotoList = fotoImmobileRepo.findByImmobile(found);
+        if (!fotoList.isEmpty()) {
+            for (int i = 0; i < fotoList.size(); i++) {
+                fotoImmobileRepo.delete(fotoList.get(i));
             }
         }
 
