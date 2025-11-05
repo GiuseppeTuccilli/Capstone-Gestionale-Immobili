@@ -24,12 +24,12 @@ public class Immobile {
     private int vani;
     private String descrizione;
     private double prezzo;
-    private boolean cantina;
-    private boolean ascensore;
-    private boolean postoAuto;
-    private boolean giardinoPrivato;
-    private boolean terrazzo;
-    private boolean arredato;
+    private boolean cantina = false;
+    private boolean ascensore = false;
+    private boolean postoAuto = false;
+    private boolean giardinoPrivato = false;
+    private boolean terrazzo = false;
+    private boolean arredato = false;
     private String indirizzo;
     private String comune;
     private String Provincia;
