@@ -157,6 +157,11 @@ public class RichiestaService {
         return ric;
     }
 
+    public List<Richiesta> findRicCompatibili(long idImmobile) {
+        List<Richiesta> foundList = incrocioRepo.findRichiesteCompatibili(idImmobile);
+        return foundList;
+    }
+
     public void cancellaRichiesta(long id) {
         Richiesta found = this.findById(id);
         //cancellazione incroci

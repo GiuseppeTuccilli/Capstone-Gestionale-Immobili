@@ -228,6 +228,11 @@ public class ImmobileService {
 
     }
 
+    public List<Immobile> findImmoCompatibili(long idRichiesta) {
+        List<Immobile> foundList = incrocioRepo.findImmobiliCompatibili(idRichiesta);
+        return foundList;
+    }
+
 
     public void cancellaImmobile(long id) {
         Immobile found = this.findById(id);
