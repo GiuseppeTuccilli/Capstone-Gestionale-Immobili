@@ -1,36 +1,34 @@
 package giuseppetuccilli.Capstone.Gestionale.Immobili.services;
 
+import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Cliente;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Immobile;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Incrocio;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Richiesta;
-import giuseppetuccilli.Capstone.Gestionale.Immobili.enums.MacroTipologiaImmobile;
-import giuseppetuccilli.Capstone.Gestionale.Immobili.exceptions.BadRequestException;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.exceptions.NotFoundException;
-import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.NewImmoPayload;
+import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.NewRichiestaPayload;
+import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.ClienteRepo;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.ImmobileRepo;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.IncrocioRepo;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.RichiestaRepo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class ImmobileService {
-    @Autowired
-    private ImmobileRepo immRepo;
+public class RichiestaService {
     @Autowired
     private RichiestaRepo richiestaRepo;
     @Autowired
+    private ImmobileRepo immobileRepo;
+    @Autowired
     private IncrocioRepo incrocioRepo;
+    @Autowired
+    private ClienteRepo clienteRepo;
 
-    public Immobile findById(long id) {
-        Optional<Immobile> found = immRepo.findById(id);
+    public Richiesta findById(long id) {
+        Optional<Richiesta> found = richiestaRepo.findById(id);
         if (found.isPresent()) {
             return found.get();
         } else {
@@ -38,44 +36,26 @@ public class ImmobileService {
         }
     }
 
-    public Page<Immobile> findAll(int pageNumber, int pageSize, String sortBy) {
-        if (pageSize > 50) pageSize = 50;
-        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).ascending());
-        return this.immRepo.findAll(pageable);
-    }
-
-    public Immobile salvaImmobile(NewImmoPayload payload) {
-        MacroTipologiaImmobile macTipo;
-        switch (payload.macroTipo().toLowerCase()) {
-            case "destinazione ordinaria":
-                macTipo = MacroTipologiaImmobile.DESTINAZIONE_ORDINARIA;
-                break;
-            case "destinazione speciale":
-                macTipo = MacroTipologiaImmobile.DESTINAZIONE_SPECIALE;
-                break;
-            case "destinazione particolare":
-                macTipo = MacroTipologiaImmobile.DESTINAZIONE_PARTICOLARE;
-                break;
-            case "entità urbana":
-                macTipo = MacroTipologiaImmobile.ENTITÀ_URBANA;
-                break;
-            default:
-                throw new BadRequestException("macro tipologia non valida");
-
+    public Richiesta salvaRichiesta(NewRichiestaPayload payload, long idCliente) {
+        Optional<Cliente> clienteFound = clienteRepo.findById(idCliente);
+        Cliente c;
+        if (clienteFound.isPresent()) {
+            c = clienteFound.get();
+        } else {
+            throw new NotFoundException(idCliente);
         }
+        Richiesta ric = new Richiesta(payload.prezzoMassimo(), payload.superficieMinimo(),
+                payload.superficieMassimo(), payload.vaniMinimo(), payload.vaniMassimo(),
+                payload.localiMinimo(), payload.localiMassimo(), payload.cantina(), payload.ascensore(),
+                payload.postoAuto(), payload.giardinoPrivato(), payload.terrazzo(), payload.arredato(),
+                payload.comune(), payload.provincia(), c);
 
-        Immobile im = new Immobile(macTipo, payload.superficie(), payload.locali(),
-                payload.vani(), payload.descrizione(), payload.prezzo(), payload.cantina(),
-                payload.ascensore(), payload.postoAuto(), payload.giardinoPrivato(), payload.terrazzo(),
-                payload.arredato(), payload.indirizzo(), payload.comune(), payload.provincia());
+        Richiesta r = richiestaRepo.save(ric);
 
-        Immobile imFromDb = immRepo.save(im);
-
-
-        List<Richiesta> richieste = richiestaRepo.findAll();
-        if (!richieste.isEmpty()) {
-            for (int i = 0; i < richieste.size(); i++) {
-                Richiesta r = richieste.get(i);
+        List<Immobile> immobili = immobileRepo.findAll();
+        if (!immobili.isEmpty()) {
+            for (int i = 0; i < immobili.size(); i++) {
+                Immobile imFromDb = immobili.get(i);
                 boolean ok = true;
                 if (r.getPrezzoMassimo() != 0 && r.getPrezzoMassimo() < imFromDb.getPrezzo()) {
                     ok = false;
@@ -122,34 +102,27 @@ public class ImmobileService {
                 if (r.isGiardinoPrivato() && !imFromDb.isGiardinoPrivato()) {
                     ok = false;
                 }
+
                 if (ok) {
                     Incrocio incrocio = new Incrocio(imFromDb, r);
                     incrocioRepo.save(incrocio);
-
                 }
-
             }
         }
-
-        return imFromDb;
-
+        return r;
     }
 
-
-    public void cancellaImmobile(long id) {
-        Immobile found = this.findById(id);
+    public void cancellaRichiesta(long id) {
+        Richiesta found = this.findById(id);
         //cancellazione incroci
         List<Incrocio> incroci = incrocioRepo.findAll();
         if (!incroci.isEmpty()) {
             for (int i = 0; i < incroci.size(); i++) {
-                if (incroci.get(i).getImmobile().getId() == found.getId()) {
+                if (incroci.get(i).getRichiesta().getId() == found.getId()) {
                     incrocioRepo.delete(incroci.get(i));
                 }
             }
         }
-
-        immRepo.delete(found);
+        richiestaRepo.delete(found);
     }
-
-
 }
