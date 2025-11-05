@@ -11,6 +11,10 @@ import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.ImmobileRepo;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.IncrocioRepo;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.RichiestaRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -34,6 +38,12 @@ public class RichiestaService {
         } else {
             throw new NotFoundException(id);
         }
+    }
+
+    public Page<Richiesta> findAll(int pageNumber, int pageSize, String sortBy) {
+        if (pageSize > 20) pageSize = 20;
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).ascending());
+        return this.richiestaRepo.findAll(pageable);
     }
 
     public Richiesta salvaRichiesta(NewRichiestaPayload payload, long idCliente) {

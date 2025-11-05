@@ -39,7 +39,7 @@ public class ImmobileService {
     }
 
     public Page<Immobile> findAll(int pageNumber, int pageSize, String sortBy) {
-        if (pageSize > 50) pageSize = 50;
+        if (pageSize > 20) pageSize = 20;
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).ascending());
         return this.immRepo.findAll(pageable);
     }
