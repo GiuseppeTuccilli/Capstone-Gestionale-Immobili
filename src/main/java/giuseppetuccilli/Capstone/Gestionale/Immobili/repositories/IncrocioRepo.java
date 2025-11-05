@@ -16,9 +16,9 @@ public interface IncrocioRepo extends JpaRepository<Incrocio, Long> {
 
     List<Incrocio> findByRichiesta(Richiesta richiesta);
 
-    @Query("SELECT i FROM Incrocio c JOIN c.Immobile i WHERE c.Richiesta.id = :richiestaId")
+    @Query("SELECT i FROM Incrocio c JOIN c.immobile i WHERE c.richiesta.id = :richiestaId")
     List<Immobile> findImmobiliCompatibili(@Param("richiestaId") Long richiestaId);
 
-    @Query("SELECT r FROM Incrocio c JOIN c.Richiesta r WHERE c.Immobile.id = :immobileId")
+    @Query("SELECT r FROM Incrocio c JOIN c.richiesta r WHERE c.immobile.id = :immobileId")
     List<Richiesta> findRichiesteCompatibili(@Param("immobileId") Long immobileId);
 }
