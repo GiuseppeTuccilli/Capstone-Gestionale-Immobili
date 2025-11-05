@@ -194,6 +194,13 @@ public class ImmobileService {
                 throw new BadRequestException("macro tipologia non valida");
 
         }
+        //cancellazione incroci
+        List<Incrocio> incrociPrec = incrocioRepo.findByImmobile(found);
+        if (!incrociPrec.isEmpty()) {
+            for (int i = 0; i < incrociPrec.size(); i++) {
+                incrocioRepo.delete(incrociPrec.get(i));
+            }
+        }
 
         found.setSuperficie(payload.superficie());
         found.setLocali((payload.locali()));
@@ -211,12 +218,7 @@ public class ImmobileService {
         found.setArredato(payload.arredato());
 
         Immobile im = immRepo.save(found);
-        List<Incrocio> incrociPrec = incrocioRepo.findByImmobile(im);
-        if (!incrociPrec.isEmpty()) {
-            for (int i = 0; i < incrociPrec.size(); i++) {
-                incrocioRepo.delete(incrociPrec.get(i));
-            }
-        }
+
         this.salvaIncroci(im);
         return im;
 
@@ -226,12 +228,10 @@ public class ImmobileService {
     public void cancellaImmobile(long id) {
         Immobile found = this.findById(id);
         //cancellazione incroci
-        List<Incrocio> incroci = incrocioRepo.findAll();
-        if (!incroci.isEmpty()) {
-            for (int i = 0; i < incroci.size(); i++) {
-                if (incroci.get(i).getImmobile().getId() == found.getId()) {
-                    incrocioRepo.delete(incroci.get(i));
-                }
+        List<Incrocio> incrociPrec = incrocioRepo.findByImmobile(found);
+        if (!incrociPrec.isEmpty()) {
+            for (int i = 0; i < incrociPrec.size(); i++) {
+                incrocioRepo.delete(incrociPrec.get(i));
             }
         }
 
