@@ -1,15 +1,9 @@
 package giuseppetuccilli.Capstone.Gestionale.Immobili.services;
 
-import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Cliente;
-import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Immobile;
-import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Incrocio;
-import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Richiesta;
+import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.*;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.exceptions.NotFoundException;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.NewRichiestaPayload;
-import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.ClienteRepo;
-import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.ImmobileRepo;
-import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.IncrocioRepo;
-import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.RichiestaRepo;
+import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -30,6 +24,10 @@ public class RichiestaService {
     private IncrocioRepo incrocioRepo;
     @Autowired
     private ClienteRepo clienteRepo;
+    @Autowired
+    private ComuneRepo comuneRepo;
+    @Autowired
+    private ProvinciaRepo provinciaRepo;
 
     public Richiesta findById(long id) {
         Optional<Richiesta> found = richiestaRepo.findById(id);
@@ -73,11 +71,19 @@ public class RichiestaService {
                 if (r.getLocaliMassimo() != 0 && r.getLocaliMassimo() < imFromDb.getLocali()) {
                     ok = false;
                 }
-                if (!r.getComune().equals("") && !(r.getComune().toLowerCase().equals(imFromDb.getComune().toLowerCase()))) {
-                    ok = false;
+
+                if (!r.getComune().equals("")) {
+                    List<Comune> comLi = comuneRepo.findByDenominazioneContainingIgnoreCase(r.getComune());
+                    if (!comLi.isEmpty() && !comLi.contains(imFromDb.getComune())) {
+                        ok = false;
+                    }
                 }
-                if (!r.getProvincia().equals("") && !(r.getProvincia().toLowerCase().equals(imFromDb.getProvincia().toLowerCase()))) {
-                    ok = false;
+
+                if (!r.getProvincia().equals("") && r.getComune().equals("")) {
+                    List<Provincia> proLi = provinciaRepo.findByNomeProvinciaContainingIgnoreCase(r.getProvincia());
+                    if (!proLi.isEmpty() && !proLi.contains(imFromDb.getComune().getProvincia())) {
+                        ok = false;
+                    }
                 }
                 if (r.isCantina() && !imFromDb.isCantina()) {
                     ok = false;
@@ -115,6 +121,27 @@ public class RichiestaService {
         } else {
             throw new NotFoundException(idCliente);
         }
+        /*
+        Comune com = null;
+        Provincia prov = null;
+        if (!payload.comune().equals("")) {
+            List<Comune> comList = comuneRepo.findByDenominazioneContainingIgnoreCase(payload.comune());
+            if (!comList.isEmpty()) {
+                com = comList.getFirst();
+                prov = com.getProvincia();
+            } else {
+                throw new BadRequestException("denominazione comune non valida");
+            }
+        }
+        if (payload.comune().equals("") && !payload.provincia().equals("")) {
+            List<Provincia> provList = provinciaRepo.findByNomeProvinciaContainingIgnoreCase(payload.provincia());
+            if (!provList.isEmpty()) {
+                prov = provList.getFirst();
+            } else {
+                throw new BadRequestException("denominazione provincia non valida");
+            }
+        }
+                 */
         Richiesta ric = new Richiesta(payload.prezzoMassimo(), payload.superficieMinimo(),
                 payload.superficieMassimo(), payload.vaniMinimo(), payload.vaniMassimo(),
                 payload.localiMinimo(), payload.localiMassimo(), payload.cantina(), payload.ascensore(),
@@ -135,6 +162,29 @@ public class RichiestaService {
                 incrocioRepo.delete(incroci.get(i));
             }
         }
+        /*
+        Comune com = null;
+        Provincia prov = null;
+        if (!payload.comune().equals("")) {
+            List<Comune> comList = comuneRepo.findByDenominazioneContainingIgnoreCase(payload.comune());
+
+            if (!comList.isEmpty()) {
+                com = comList.getFirst();
+                prov = com.getProvincia();
+            } else {
+                throw new BadRequestException("denominazione comune non valida");
+            }
+        }
+        if (payload.comune().equals("") && !payload.provincia().equals("")) {
+            List<Provincia> provList = provinciaRepo.findByNomeProvinciaContainingIgnoreCase(payload.provincia());
+            if (!provList.isEmpty()) {
+                prov = provList.getFirst();
+            } else {
+                throw new BadRequestException("denominazione provincia non valida");
+            }
+        }
+
+         */
 
         found.setPrezzoMassimo(payload.prezzoMassimo());
         found.setSuperficieMassimo(payload.superficieMassimo());

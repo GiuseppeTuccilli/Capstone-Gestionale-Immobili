@@ -28,6 +28,10 @@ public class ImmobileService {
     private FotoImmobileRepo fotoImmobileRepo;
     @Autowired
     private VisitaRepo visitaRepo;
+    @Autowired
+    private ComuneRepo comuneRepo;
+    @Autowired
+    private ProvinciaRepo provinciaRepo;
 
     public Immobile findById(long id) {
         Optional<Immobile> found = immRepo.findById(id);
@@ -65,12 +69,29 @@ public class ImmobileService {
                 if (r.getLocaliMassimo() != 0 && r.getLocaliMassimo() < imFromDb.getLocali()) {
                     ok = false;
                 }
-                if (!r.getComune().equals("") && !(r.getComune().toLowerCase().equals(imFromDb.getComune().toLowerCase()))) {
+                /*
+                if (r.getComune() != null && !(r.getComune().equals(imFromDb.getComune()))) {
                     ok = false;
                 }
-                if (!r.getProvincia().equals("") && !(r.getProvincia().toLowerCase().equals(imFromDb.getProvincia().toLowerCase()))) {
+                if (r.getProvincia() != null && r.getComune() == null && !(r.getProvincia().equals(imFromDb.getProvincia()))) {
                     ok = false;
                 }
+
+                 */
+                if (!r.getComune().equals("")) {
+                    List<Comune> comLi = comuneRepo.findByDenominazioneContainingIgnoreCase(r.getComune());
+                    if (!comLi.isEmpty() && !comLi.contains(imFromDb.getComune())) {
+                        ok = false;
+                    }
+                }
+
+                if (!r.getProvincia().equals("") && r.getComune().equals("")) {
+                    List<Provincia> proLi = provinciaRepo.findByNomeProvinciaContainingIgnoreCase(r.getProvincia());
+                    if (!proLi.isEmpty() && !proLi.contains(imFromDb.getComune().getProvincia())) {
+                        ok = false;
+                    }
+                }
+                
                 if (r.isCantina() && !imFromDb.isCantina()) {
                     ok = false;
                 }
@@ -143,10 +164,19 @@ public class ImmobileService {
 
         }
 
+        List<Comune> comuneList = comuneRepo.findByDenominazioneContainingIgnoreCase(payload.comune());
+        Comune comune;
+        if (!comuneList.isEmpty()) {
+            comune = comuneList.getFirst();
+        } else {
+            throw new BadRequestException("denominazione comune non valida");
+        }
+
+
         Immobile im = new Immobile(macTipo, payload.superficie(), payload.locali(),
                 payload.vani(), payload.descrizione(), payload.prezzo(), payload.cantina(),
                 payload.ascensore(), payload.postoAuto(), payload.giardinoPrivato(), payload.terrazzo(),
-                payload.arredato(), payload.indirizzo(), payload.comune(), payload.provincia());
+                payload.arredato(), payload.indirizzo(), comune);
 
         Immobile imFromDb = immRepo.save(im);
 
@@ -194,6 +224,18 @@ public class ImmobileService {
                 throw new BadRequestException("macro tipologia non valida");
 
         }
+
+        Comune com;
+
+
+        List<Comune> comuneList = comuneRepo.findByDenominazioneContainingIgnoreCase(payload.comune());
+        if (!comuneList.isEmpty()) {
+            com = comuneList.getFirst();
+
+        } else {
+            throw new BadRequestException("denominazione comune non valida");
+        }
+
         //cancellazione incroci
         List<Incrocio> incrociPrec = incrocioRepo.findByImmobile(found);
         if (!incrociPrec.isEmpty()) {
@@ -208,8 +250,7 @@ public class ImmobileService {
         found.setDescrizione(payload.descrizione());
         found.setPrezzo(payload.prezzo());
         found.setIndirizzo(payload.indirizzo());
-        found.setComune(payload.comune());
-        found.setProvincia(payload.provincia());
+        found.setComune(com);
         found.setCantina(payload.cantina());
         found.setAscensore(payload.ascensore());
         found.setPostoAuto(payload.postoAuto());

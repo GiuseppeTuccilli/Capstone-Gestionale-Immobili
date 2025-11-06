@@ -21,8 +21,7 @@ public record NewImmoPayload(
         String indirizzo,
         @NotBlank
         String comune,
-        @NotBlank
-        String provincia,
+        
         boolean cantina,
         boolean ascensore,
         boolean postoAuto,
