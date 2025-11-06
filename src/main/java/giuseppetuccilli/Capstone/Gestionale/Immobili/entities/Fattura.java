@@ -26,9 +26,9 @@ public class Fattura {
     @JoinColumn(name = "id_cliente")
     private Cliente cliente;
 
-    public Fattura(double importo, Cliente cliente, String causale) {
+    public Fattura(double importo, Cliente cliente, String causale, LocalDate data) {
         this.importo = importo;
-        this.data = LocalDate.now();
+        this.data = data;
         this.cliente = cliente;
         this.causale = causale;
     }
