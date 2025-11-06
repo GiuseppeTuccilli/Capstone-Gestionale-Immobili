@@ -90,4 +90,9 @@ public class VisitaService {
         return v;
 
     }
+
+    public void cancellaVisita(long id) {
+        Visita found = this.findById(id);
+        visitaRepo.delete(found);
+    }
 }
