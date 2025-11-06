@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -69,6 +70,16 @@ public class VisitaService {
             immobile = imFound.get();
         } else {
             throw new NotFoundException(payload.idImmobile());
+        }
+
+        //controllo che l'immobile non abbia una visita per quella data
+        List<Visita> visiteImm = visitaRepo.findByImmobile(immobile);
+        if (!visiteImm.isEmpty()) {
+            for (int i = 0; i < visiteImm.size(); i++) {
+                if (visiteImm.get(i).getData() == data) {
+                    throw new BadRequestException("questo immobile ha già una visita per la data " + data.toString());
+                }
+            }
         }
 
         Optional<Cliente> clFound = clienteRepo.findById(payload.idCliente());
