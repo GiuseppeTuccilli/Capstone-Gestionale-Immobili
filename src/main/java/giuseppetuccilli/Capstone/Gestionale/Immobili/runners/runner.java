@@ -1,14 +1,19 @@
 package giuseppetuccilli.Capstone.Gestionale.Immobili.runners;
 
-import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.ClienteRepo;
-import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.ImmobileRepo;
-import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.RichiestaRepo;
+import giuseppetuccilli.Capstone.Gestionale.Immobili.importazione.CsvImportService;
+import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.NewClientePayload;
+import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.NewImmoPayload;
+import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.NewRichiestaPayload;
+import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.*;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.services.ClienteService;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.services.ImmobileService;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.services.RichiestaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @Component
 public class runner implements CommandLineRunner {
@@ -24,13 +29,32 @@ public class runner implements CommandLineRunner {
     private RichiestaRepo richiestaRepo;
     @Autowired
     private RichiestaService richiestaService;
+    @Autowired
+    private ProvinciaRepo provRepo;
+    @Autowired
+    private ComuneRepo comRepo;
+    @Autowired
+    private CsvImportService importService;
 
     @Override
     public void run(String... args) throws Exception {
-        /*
-        NewImmoPayload imPay = new NewImmoPayload("entità urbana", 100, 5, 5, "bello", 100000, "via vattela pesca", "Esperia", "FR", false, true, false, false, false, true);
-        NewImmoPayload imPay2 = new NewImmoPayload("entità urbana", 150, 10, 6, "molto bello", 150000, "via vattela pesca 2", "Pontecorvo", "FR", true, true, true, false, false, true);
-        NewImmoPayload imPay3 = new NewImmoPayload("entità urbana", 200, 12, 7, "bellissimo", 200000, "via vattela pesca 3", "Cassino", "FR", true, true, true, true, true, true);
+
+        Path provincePath = Paths.get("src/province-italiane.csv");
+        Path comunePath = Paths.get("src/comuni-italiani.csv");
+
+        if (provRepo.findAll().isEmpty()) {
+            importService.salvaProvince(provincePath);
+            System.out.println("tutto bene province");
+        }
+        if (comRepo.findAll().isEmpty()) {
+            importService.salvaComuni(comunePath);
+            System.out.println("tutto bene comuni");
+        }
+
+
+        NewImmoPayload imPay = new NewImmoPayload("entità urbana", 100, 5, 5, "bello", 100000, "via vattela pesca", "Esperia", false, true, false, false, false, true);
+        NewImmoPayload imPay2 = new NewImmoPayload("entità urbana", 150, 10, 6, "molto bello", 150000, "via vattela pesca 2", "Pontecorvo", true, true, true, false, false, true);
+        NewImmoPayload imPay3 = new NewImmoPayload("entità urbana", 200, 12, 7, "bellissimo", 200000, "via vattela pesca 3", "Cassino", true, true, true, true, true, true);
         if (immobileRepo.findAll().isEmpty()) {
             imServ.salvaImmobile(imPay);
             imServ.salvaImmobile(imPay2);
@@ -46,7 +70,10 @@ public class runner implements CommandLineRunner {
 
         NewRichiestaPayload r = new NewRichiestaPayload(150000, 50, 0, 5, 0, 6, 0, "Pontecorvo", "", false, false, false, false, false, false);
         NewRichiestaPayload r2 = new NewRichiestaPayload(2000000, 50, 0, 5, 0, 5, 0, "", "", false, false, false, false, false, false);
-*/
+
+        richiestaService.salvaRichiesta(r, 1);
+        richiestaService.salvaRichiesta(r2, 2);
+
 
     }
 }
