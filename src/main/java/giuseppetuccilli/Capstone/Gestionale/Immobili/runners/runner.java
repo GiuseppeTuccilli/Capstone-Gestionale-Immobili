@@ -4,12 +4,15 @@ import giuseppetuccilli.Capstone.Gestionale.Immobili.importazione.CsvImportServi
 import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.NewClientePayload;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.NewImmoPayload;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.NewRichiestaPayload;
+import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.RegistUtentePayload;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.*;
+import giuseppetuccilli.Capstone.Gestionale.Immobili.services.AuthService;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.services.ClienteService;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.services.ImmobileService;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.services.RichiestaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
@@ -35,6 +38,12 @@ public class runner implements CommandLineRunner {
     private ComuneRepo comRepo;
     @Autowired
     private CsvImportService importService;
+    @Autowired
+    private PasswordEncoder bCrypt;
+    @Autowired
+    private UtenteRepo utenteRepo;
+    @Autowired
+    private AuthService authService;
 
     @Override
     public void run(String... args) throws Exception {
@@ -71,6 +80,15 @@ public class runner implements CommandLineRunner {
         NewRichiestaPayload r = new NewRichiestaPayload(150000, 50, 0, 5, 0, 6, 0, "Pontecorvo", "", false, false, false, false, false, false);
         NewRichiestaPayload r2 = new NewRichiestaPayload(2000000, 50, 0, 5, 0, 5, 0, "", "", false, false, false, false, false, false);
 
-        
+
+        RegistUtentePayload ut = new RegistUtentePayload("mario", "rossi", "marioRossi@gmail.com", bCrypt.encode("12345678"), "2541526987");
+        RegistUtentePayload ut2 = new RegistUtentePayload("dario", "bianchi", "darioBianchi@gmail.com", bCrypt.encode("12345678"), "2541526987");
+
+        if (utenteRepo.findAll().isEmpty()) {
+            authService.salvaAdmin(ut);
+            authService.salvaUtente(ut2);
+        }
+
+       
     }
 }
