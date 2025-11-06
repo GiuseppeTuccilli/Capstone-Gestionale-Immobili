@@ -1,17 +1,11 @@
 package giuseppetuccilli.Capstone.Gestionale.Immobili.services;
 
-import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.FotoImmobile;
-import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Immobile;
-import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Incrocio;
-import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Richiesta;
+import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.*;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.enums.MacroTipologiaImmobile;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.exceptions.BadRequestException;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.exceptions.NotFoundException;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.NewImmoPayload;
-import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.FotoImmobileRepo;
-import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.ImmobileRepo;
-import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.IncrocioRepo;
-import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.RichiestaRepo;
+import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,6 +26,8 @@ public class ImmobileService {
     private IncrocioRepo incrocioRepo;
     @Autowired
     private FotoImmobileRepo fotoImmobileRepo;
+    @Autowired
+    private VisitaRepo visitaRepo;
 
     public Immobile findById(long id) {
         Optional<Immobile> found = immRepo.findById(id);
@@ -236,6 +232,7 @@ public class ImmobileService {
 
     public void cancellaImmobile(long id) {
         Immobile found = this.findById(id);
+
         //cancellazione incroci
         List<Incrocio> incrociPrec = incrocioRepo.findByImmobile(found);
         if (!incrociPrec.isEmpty()) {
@@ -243,11 +240,20 @@ public class ImmobileService {
                 incrocioRepo.delete(incrociPrec.get(i));
             }
         }
+
         //cancellazione foto
         List<FotoImmobile> fotoList = fotoImmobileRepo.findByImmobile(found);
         if (!fotoList.isEmpty()) {
             for (int i = 0; i < fotoList.size(); i++) {
                 fotoImmobileRepo.delete(fotoList.get(i));
+            }
+        }
+
+        //cancellazione visite
+        List<Visita> visite = visitaRepo.findByImmobile(found);
+        if (!visite.isEmpty()) {
+            for (int i = 0; i < visite.size(); i++) {
+                visitaRepo.delete(visite.get(i));
             }
         }
 

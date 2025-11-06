@@ -162,6 +162,19 @@ public class RichiestaService {
         return foundList;
     }
 
+    public List<Richiesta> findByCliente(long idCliente) {
+        Cliente c;
+        Optional<Cliente> foundCliente = clienteRepo.findById(idCliente);
+        if (foundCliente.isPresent()) {
+            c = foundCliente.get();
+        } else {
+            throw new NotFoundException(idCliente);
+        }
+
+        List<Richiesta> foundList = richiestaRepo.findByCliente(c);
+        return foundList;
+    }
+
     public void cancellaRichiesta(long id) {
         Richiesta found = this.findById(id);
         //cancellazione incroci
