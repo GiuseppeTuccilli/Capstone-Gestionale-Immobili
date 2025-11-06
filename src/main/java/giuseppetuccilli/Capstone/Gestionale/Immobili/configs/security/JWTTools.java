@@ -37,4 +37,9 @@ public class JWTTools {
         return UUID.fromString(Jwts.parser().verifyWith(Keys.hmacShaKeyFor(secret.getBytes())).build()
                 .parseSignedClaims(token).getPayload().getSubject());
     }
+
+    public long extractLongId(String token) {
+        return Long.parseLong(Jwts.parser().verifyWith(Keys.hmacShaKeyFor(secret.getBytes())).build()
+                .parseSignedClaims(token).getPayload().getSubject());
+    }
 }
