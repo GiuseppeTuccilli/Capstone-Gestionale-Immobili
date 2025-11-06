@@ -71,9 +71,6 @@ public class runner implements CommandLineRunner {
         NewRichiestaPayload r = new NewRichiestaPayload(150000, 50, 0, 5, 0, 6, 0, "Pontecorvo", "", false, false, false, false, false, false);
         NewRichiestaPayload r2 = new NewRichiestaPayload(2000000, 50, 0, 5, 0, 5, 0, "", "", false, false, false, false, false, false);
 
-        richiestaService.salvaRichiesta(r, 1);
-        richiestaService.salvaRichiesta(r2, 2);
-
-
+        
     }
 }
