@@ -27,7 +27,7 @@ public class ExceptionsHandler {
     @ExceptionHandler(UnauthorizedException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ErrorsDTO handleUnauthorized(UnauthorizedException ex) {
-        return new ErrorsDTO("accesso non autorizzato");
+        return new ErrorsDTO(ex.getMessage());
     }
 
     @ExceptionHandler(ValidazioneFallitaExeption.class)
@@ -36,7 +36,6 @@ public class ExceptionsHandler {
         return new ErrorsWithListDTO(ex.getMessage(), ex.getMsgList());
 
     }
-
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
