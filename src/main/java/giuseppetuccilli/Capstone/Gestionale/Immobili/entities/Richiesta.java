@@ -57,4 +57,15 @@ public class Richiesta {
         this.provincia = provincia;
         this.cliente = cliente;
     }
+
+    @Override
+    public String toString() {
+        return "Richiesta{" +
+                "id=" + id +
+                ", prezzoMassimo=" + prezzoMassimo +
+                ", superficieMinimo=" + superficieMinimo +
+                ", vaniMinimo=" + vaniMinimo +
+                ", vaniMassimo=" + vaniMassimo +
+                '}';
+    }
 }

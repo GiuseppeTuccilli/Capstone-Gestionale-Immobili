@@ -59,4 +59,16 @@ public class Immobile {
         this.comune = comune;
         Provincia = provincia;
     }
+
+    @Override
+    public String toString() {
+        return "Immobile{" +
+                "id=" + id +
+                ", MacroTipologia=" + MacroTipologia +
+                ", superficie=" + superficie +
+                ", locali=" + locali +
+                ", vani=" + vani +
+                ", prezzo=" + prezzo +
+                '}';
+    }
 }
