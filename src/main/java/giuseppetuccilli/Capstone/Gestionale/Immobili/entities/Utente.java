@@ -1,10 +1,7 @@
 package giuseppetuccilli.Capstone.Gestionale.Immobili.entities;
 
 import giuseppetuccilli.Capstone.Gestionale.Immobili.enums.RuoliUtente;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,6 +28,7 @@ public class Utente implements UserDetails {
     private String email;
     private String password;
     private String telefono;
+    @Enumerated(EnumType.STRING)
     private RuoliUtente ruolo;
 
     public Utente(String nome, String cognome, String email, String password, String telefono, RuoliUtente ruolo) {
