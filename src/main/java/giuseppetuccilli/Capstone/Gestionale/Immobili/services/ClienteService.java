@@ -53,6 +53,18 @@ public class ClienteService {
         return c;
     }
 
+    public Cliente modificaCliente(NewClientePayload payload, long id) {
+        Cliente found = this.findById(id);
+        found.setNome(payload.nome());
+        found.setCognome(payload.cognome());
+        found.setIndirizzo(payload.indirizzo());
+        found.setTelefono(payload.telefono());
+        found.setEmail(payload.email());
+
+        Cliente c = clienteRepo.save(found);
+        return c;
+    }
+
     public void cancellaCliente(long id) {
         Cliente found = this.findById(id);
 
