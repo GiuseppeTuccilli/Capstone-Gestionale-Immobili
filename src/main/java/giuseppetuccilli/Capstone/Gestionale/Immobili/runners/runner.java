@@ -89,6 +89,6 @@ public class runner implements CommandLineRunner {
             authService.salvaUtente(ut2);
         }
 
-       
+
     }
 }
