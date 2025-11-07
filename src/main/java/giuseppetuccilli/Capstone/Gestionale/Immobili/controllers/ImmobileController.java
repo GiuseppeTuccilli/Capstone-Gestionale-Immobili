@@ -3,13 +3,16 @@ package giuseppetuccilli.Capstone.Gestionale.Immobili.controllers;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.FotoImmobile;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Immobile;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Richiesta;
+import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Visita;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.exceptions.ValidazioneFallitaExeption;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.NewImmoPayload;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.responses.FotoForListDTO;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.services.FotoImmobileService;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.services.ImmobileService;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.services.RichiestaService;
+import giuseppetuccilli.Capstone.Gestionale.Immobili.services.VisitaService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
@@ -29,6 +32,8 @@ public class ImmobileController {
     private RichiestaService richiestaService;
     @Autowired
     private FotoImmobileService fotoImmobileService;
+    @Autowired
+    private VisitaService visitaService;
 
     //dettagli immobile
     @GetMapping("/{id}")
@@ -98,6 +103,17 @@ public class ImmobileController {
         return res;
 
 
+    }
+
+    //visite immobile
+    @GetMapping("/{id}/visite")
+    public Page<Visita> getVisiteImmobile(
+            @PathVariable long id,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "data") String sortBy
+    ) {
+        return visitaService.findByImmobile(id, page, size, sortBy);
     }
 
 

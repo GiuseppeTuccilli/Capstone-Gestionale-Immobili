@@ -3,6 +3,7 @@ package giuseppetuccilli.Capstone.Gestionale.Immobili.controllers;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Cliente;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Fattura;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Richiesta;
+import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Visita;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.exceptions.ValidazioneFallitaExeption;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.NewClientePayload;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.NewRichiestaPayload;
@@ -12,7 +13,9 @@ import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.responses.Richiest
 import giuseppetuccilli.Capstone.Gestionale.Immobili.services.ClienteService;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.services.FatturaService;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.services.RichiestaService;
+import giuseppetuccilli.Capstone.Gestionale.Immobili.services.VisitaService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
@@ -31,6 +34,8 @@ public class ClienteController {
     private RichiestaService richiestaService;
     @Autowired
     private FatturaService fatturaService;
+    @Autowired
+    private VisitaService visitaService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -123,7 +128,18 @@ public class ClienteController {
             }
         }
         return res;
+    }
 
+    //get visite cliente
+    @GetMapping("/{id}/visite")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    public Page<Visita> getVisiteCliente(
+            @PathVariable long id,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "data") String sortBy
+    ) {
+        return visitaService.findByCliente(id, page, size, sortBy);
     }
 
 
