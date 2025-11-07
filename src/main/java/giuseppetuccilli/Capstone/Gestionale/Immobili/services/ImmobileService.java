@@ -267,6 +267,10 @@ public class ImmobileService {
     }
 
     public List<Immobile> findImmoCompatibili(long idRichiesta) {
+        Optional<Richiesta> ricFound = richiestaRepo.findById(idRichiesta);
+        if (!ricFound.isPresent()) {
+            throw new NotFoundException(idRichiesta);
+        }
         List<Immobile> foundList = incrocioRepo.findImmobiliCompatibili(idRichiesta);
         return foundList;
     }

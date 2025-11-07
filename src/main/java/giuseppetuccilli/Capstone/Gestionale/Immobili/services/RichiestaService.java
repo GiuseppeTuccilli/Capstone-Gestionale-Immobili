@@ -208,6 +208,10 @@ public class RichiestaService {
     }
 
     public List<Richiesta> findRicCompatibili(long idImmobile) {
+        Optional<Immobile> imFound = immobileRepo.findById(idImmobile);
+        if (!imFound.isPresent()) {
+            throw new NotFoundException(idImmobile);
+        }
         List<Richiesta> foundList = incrocioRepo.findRichiesteCompatibili(idImmobile);
         return foundList;
     }
