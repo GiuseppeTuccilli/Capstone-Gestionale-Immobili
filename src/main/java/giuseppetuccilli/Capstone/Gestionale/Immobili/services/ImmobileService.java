@@ -1,5 +1,7 @@
 package giuseppetuccilli.Capstone.Gestionale.Immobili.services;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.*;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.enums.MacroTipologiaImmobile;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.exceptions.BadRequestException;
@@ -12,12 +14,17 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
 public class ImmobileService {
+    private static final long MAX_SIZE = 10 * 1024 * 1024; //10 Mb ;
+    private static final List<String> ALLOWED_TYPES = List.of("image/jpg", "image/jpeg", "image/png");
     @Autowired
     private ImmobileRepo immRepo;
     @Autowired
@@ -32,6 +39,8 @@ public class ImmobileService {
     private ComuneRepo comuneRepo;
     @Autowired
     private ProvinciaRepo provinciaRepo;
+    @Autowired
+    private Cloudinary imageUploader;
 
     public Immobile findById(long id) {
         Optional<Immobile> found = immRepo.findById(id);
@@ -304,6 +313,52 @@ public class ImmobileService {
         }
 
         immRepo.delete(found);
+    }
+
+    public Immobile aggiungiFoto(long id, MultipartFile file) {
+        Immobile found = this.findById(id);
+
+        //controllo che il file non sia vuoto
+        if (file.isEmpty()) {
+            throw new BadRequestException("il file è vuoto");
+        }
+        //non superi i 10 MB
+        if (file.getSize() > MAX_SIZE) {
+            throw new BadRequestException("il file supera la dimensione massima consentita");
+        }
+        //sia di tipo jpg, jpeg o png
+        if (!ALLOWED_TYPES.contains(file.getContentType())) {
+            throw new BadRequestException("formato del file non supportato");
+        }
+        //numero massimo di foto
+
+
+        try {
+            Map res = imageUploader.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
+            String imgUrl = (String) res.get("url");
+            FotoImmobile foto = new FotoImmobile(imgUrl, found);
+            FotoImmobile fotoToAdd = fotoImmobileRepo.save(foto);
+            return found;
+
+        } catch (IOException ex) {
+            throw new BadRequestException("errore nell'upload");
+        }
+    }
+
+    public void cancellaFoto(long idIm, long idFoto) {
+        Immobile i = this.findById(idIm);
+        List<FotoImmobile> fotoList = fotoImmobileRepo.findByImmobile(i);
+        Optional<FotoImmobile> found = fotoImmobileRepo.findById(idFoto);
+        FotoImmobile f;
+        if (found.isPresent()) {
+            f = found.get();
+        } else {
+            throw new BadRequestException("id foto non valido");
+        }
+        if (fotoList.isEmpty() || !fotoList.contains(f)) {
+            throw new BadRequestException("questo immobile non ha foto associate");
+        }
+        fotoImmobileRepo.delete(f);
     }
 
 
