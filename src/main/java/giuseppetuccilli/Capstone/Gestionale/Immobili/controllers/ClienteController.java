@@ -1,13 +1,16 @@
 package giuseppetuccilli.Capstone.Gestionale.Immobili.controllers;
 
 import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Cliente;
+import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Fattura;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Richiesta;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.exceptions.ValidazioneFallitaExeption;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.NewClientePayload;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.NewRichiestaPayload;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.responses.ClienteResDTO;
+import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.responses.FatturaResDTO;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.responses.RichiestaResDTO;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.services.ClienteService;
+import giuseppetuccilli.Capstone.Gestionale.Immobili.services.FatturaService;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.services.RichiestaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,6 +29,8 @@ public class ClienteController {
     private ClienteService clienteService;
     @Autowired
     private RichiestaService richiestaService;
+    @Autowired
+    private FatturaService fatturaService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -97,6 +102,22 @@ public class ClienteController {
             res.add(resItem);
         }
         return res;
+    }
+
+    //get fatture cliente
+    @GetMapping("/{id}/fatture")
+    public List<FatturaResDTO> getFatture(@PathVariable long id) {
+        List<FatturaResDTO> res = new ArrayList<>();
+        List<Fattura> fatList = fatturaService.findByCliente(id);
+        if (!fatList.isEmpty()) {
+            for (int i = 0; i < fatList.size(); i++) {
+                Fattura f = fatList.get(i);
+                FatturaResDTO resItem = new FatturaResDTO(f.getNumero(), f.getCausale(), f.getImporto(), f.getData(), f.getCliente().getId());
+                res.add(resItem);
+            }
+        }
+        return res;
+
     }
 
 

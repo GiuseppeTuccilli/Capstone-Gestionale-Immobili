@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -67,5 +68,17 @@ public class FatturaService {
     public void cancellaFattura(long id) {
         Fattura found = this.findById(id);
         fatturaRepo.delete(found);
+    }
+
+    public List<Fattura> findByCliente(long idCliente) {
+        Optional<Cliente> foundCli = clienteRepo.findById(idCliente);
+        Cliente c;
+        if (foundCli.isPresent()) {
+            c = foundCli.get();
+        } else {
+            throw new BadRequestException("cliente con id " + idCliente + " non presente nel database");
+        }
+        List<Fattura> foundList = fatturaRepo.findByCliente(c);
+        return foundList;
     }
 }
