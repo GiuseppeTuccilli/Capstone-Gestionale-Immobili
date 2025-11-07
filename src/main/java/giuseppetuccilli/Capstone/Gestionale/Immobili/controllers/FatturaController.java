@@ -36,6 +36,11 @@ public class FatturaController {
         return new FatturaResDTO(f.getNumero(), f.getCausale(), f.getImporto(), f.getData(), f.getCliente().getId());
     }
 
+    @GetMapping("/{numero}")
+    public Fattura getFattura(@PathVariable long numero) {
+        return fatturaService.findById(numero);
+    }
+
     //cancellazione fattura
     @DeleteMapping("/{numero}")
     @ResponseStatus(HttpStatus.NO_CONTENT)

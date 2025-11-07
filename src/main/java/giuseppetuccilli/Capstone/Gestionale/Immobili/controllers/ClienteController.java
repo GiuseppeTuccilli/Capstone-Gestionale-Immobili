@@ -48,6 +48,12 @@ public class ClienteController {
 
     }
 
+    //dettagli cliente
+    @GetMapping("/{id}")
+    public Cliente getCliente(@PathVariable long id) {
+        return clienteService.findById(id);
+    }
+
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('ADMIN')")
     public ClienteResDTO modificaCliente(@RequestBody @Validated NewClientePayload body, BindingResult valRes, @PathVariable long id) {
