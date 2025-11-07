@@ -229,7 +229,7 @@ public class ImmobileService {
         Comune com;
 
 
-        List<Comune> comuneList = comuneRepo.findByDenominazioneContainingIgnoreCase(payload.comune());
+        List<Comune> comuneList = comuneRepo.findByDenominazioneIgnoreCase(payload.comune());
         if (!comuneList.isEmpty()) {
             com = comuneList.getFirst();
 
