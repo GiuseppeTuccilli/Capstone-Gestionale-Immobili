@@ -4,6 +4,7 @@ package giuseppetuccilli.Capstone.Gestionale.Immobili.exceptions;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.responses.ErrorsDTO;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.responses.ErrorsWithListDTO;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -36,6 +37,14 @@ public class ExceptionsHandler {
         return new ErrorsWithListDTO(ex.getMessage(), ex.getMsgList());
 
     }
+
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ErrorsDTO handleServiceError(AuthorizationDeniedException ex) {
+        ex.printStackTrace();
+        return new ErrorsDTO("non hai i permessi per accedere a questa funzionalità");
+    }
+
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
