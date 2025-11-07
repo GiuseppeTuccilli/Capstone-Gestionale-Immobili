@@ -12,6 +12,10 @@ import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.ImmobileRepo;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.UtenteRepo;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.VisitaRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -50,6 +54,12 @@ public class VisitaService {
         }
     }
 
+    public Page<Visita> findAll(int pageNumber, int pageSize, String sortBy) {
+        if (pageSize > 20) pageSize = 20;
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).ascending());
+        return this.visitaRepo.findAll(pageable);
+    }
+
     public Visita findById(long id) {
         Optional<Visita> found = visitaRepo.findById(id);
         if (found.isPresent()) {
@@ -59,7 +69,7 @@ public class VisitaService {
         }
     }
 
-    public Visita salvaVisita(NewVisitaPayload payload) {
+    public Visita salvaVisita(NewVisitaPayload payload, long idUtente) {
         LocalDate data = getData(payload.data());
         Immobile immobile;
         Cliente cliente;
@@ -76,7 +86,7 @@ public class VisitaService {
         List<Visita> visiteImm = visitaRepo.findByImmobile(immobile);
         if (!visiteImm.isEmpty()) {
             for (int i = 0; i < visiteImm.size(); i++) {
-                if (visiteImm.get(i).getData() == data) {
+                if (visiteImm.get(i).getData().equals(data)) {
                     throw new BadRequestException("questo immobile ha già una visita per la data " + data.toString());
                 }
             }
@@ -89,11 +99,11 @@ public class VisitaService {
             throw new NotFoundException(payload.idCliente());
         }
 
-        Optional<Utente> utFound = utenteRepo.findById(payload.idUtente());
+        Optional<Utente> utFound = utenteRepo.findById(idUtente);
         if (utFound.isPresent()) {
             utente = utFound.get();
         } else {
-            throw new NotFoundException(payload.idUtente());
+            throw new NotFoundException(idUtente);
         }
 
         Visita visita = new Visita(data, immobile, cliente, utente);
@@ -105,5 +115,16 @@ public class VisitaService {
     public void cancellaVisita(long id) {
         Visita found = this.findById(id);
         visitaRepo.delete(found);
+    }
+
+    public List<Visita> findByUtente(long id) {
+        Optional<Utente> found = utenteRepo.findById(id);
+        Utente u;
+        if (found.isPresent()) {
+            u = found.get();
+        } else {
+            throw new NotFoundException(id);
+        }
+        return visitaRepo.findByUtente(u);
     }
 }

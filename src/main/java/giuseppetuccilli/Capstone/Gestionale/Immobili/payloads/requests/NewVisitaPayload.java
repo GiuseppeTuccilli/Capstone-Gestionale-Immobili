@@ -11,8 +11,7 @@ public record NewVisitaPayload(
         @NotNull
         long idImmobile,
         @NotNull
-        long idCliente,
-        @NotNull
-        long idUtente
+        long idCliente
+
 ) {
 }

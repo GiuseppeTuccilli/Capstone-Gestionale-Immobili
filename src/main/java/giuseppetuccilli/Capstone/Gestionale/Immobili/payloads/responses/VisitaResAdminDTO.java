@@ -2,10 +2,11 @@ package giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.responses;
 
 import java.time.LocalDate;
 
-public record VisitaResDTO(
+public record VisitaResAdminDTO(
         long idVisita,
         long idCliente,
         long idImmobile,
-        LocalDate data
+        LocalDate data,
+        long idUtente
 ) {
 }

@@ -1,5 +1,6 @@
 package giuseppetuccilli.Capstone.Gestionale.Immobili.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.enums.RuoliUtente;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -18,6 +19,7 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
+@JsonIgnoreProperties({"password", "authorities", "enabled", "accountNonLocked", "accountNonExpired", "credentialsNonExpired", "username"})
 public class Utente implements UserDetails {
     @Id
     @GeneratedValue
