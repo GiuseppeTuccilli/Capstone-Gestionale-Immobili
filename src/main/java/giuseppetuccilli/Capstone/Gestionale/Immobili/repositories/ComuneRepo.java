@@ -11,5 +11,7 @@ import java.util.List;
 public interface ComuneRepo extends JpaRepository<Comune, Long> {
     List<Comune> findByDenominazioneContainingIgnoreCase(String denominazione);
 
+    List<Comune> findByDenominazioneIgnoreCase(String denominazione);
+
     List<Comune> findByProvincia(Provincia provincia);
 }
