@@ -83,5 +83,21 @@ public class ClienteController {
 
     }
 
+    //get richieste per cliente
+    @GetMapping("/{id}/richieste")
+    public List<RichiestaResDTO> getRichieste(@PathVariable long id) {
+        List<RichiestaResDTO> res = new ArrayList<>();
+        List<Richiesta> ricList = richiestaService.findByCliente(id);
+        for (int i = 0; i < ricList.size(); i++) {
+            Richiesta r = ricList.get(i);
+            RichiestaResDTO resItem = new RichiestaResDTO(r.getId(), r.getPrezzoMassimo(), r.getSuperficieMinimo(),
+                    r.getSuperficieMassimo(), r.getVaniMinimo(), r.getVaniMassimo(), r.getLocaliMinimo(),
+                    r.getLocaliMassimo(), r.getComune(), r.getProvincia(), r.isCantina(), r.isAscensore(),
+                    r.isPostoAuto(), r.isGiardinoPrivato(), r.isTerrazzo(), r.isArredato(), r.getCliente().getId());
+            res.add(resItem);
+        }
+        return res;
+    }
+
 
 }
