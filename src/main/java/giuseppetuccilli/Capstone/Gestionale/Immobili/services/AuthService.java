@@ -2,13 +2,16 @@ package giuseppetuccilli.Capstone.Gestionale.Immobili.services;
 
 import giuseppetuccilli.Capstone.Gestionale.Immobili.configs.security.JWTTools;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Utente;
+import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Visita;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.enums.RuoliUtente;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.exceptions.BadRequestException;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.exceptions.NotFoundException;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.exceptions.UnauthorizedException;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.LoginRequest;
+import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.NewPasswordPayload;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.RegistUtentePayload;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.UtenteRepo;
+import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.VisitaRepo;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.specifications.UtenteSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,6 +21,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -28,6 +32,8 @@ public class AuthService {
     private PasswordEncoder bcrypt;
     @Autowired
     private JWTTools jwtTools;
+    @Autowired
+    private VisitaRepo visitaRepo;
 
     public Utente findById(long id) {
         Optional<Utente> found = utenteRepo.findById(id);
@@ -90,6 +96,26 @@ public class AuthService {
         }
         found.setRuolo(RuoliUtente.ADMIN);
         return utenteRepo.save(found);
+    }
+
+    //cambio password
+    public Utente cambiaPassword(NewPasswordPayload payload, long id) {
+        Utente found = this.findById(id);
+        found.setPassword(bcrypt.encode(payload.password()));
+        return utenteRepo.save(found);
+
+    }
+
+    //cancellazione utente
+    public void cancellaUtente(long id) {
+        Utente found = this.findById(id);
+        List<Visita> visite = visitaRepo.findByUtente(found);
+        if (!visite.isEmpty()) {
+            for (int i = 0; i < visite.size(); i++) {
+                visitaRepo.delete(visite.get(i));
+            }
+        }
+        utenteRepo.delete(found);
     }
 
 
