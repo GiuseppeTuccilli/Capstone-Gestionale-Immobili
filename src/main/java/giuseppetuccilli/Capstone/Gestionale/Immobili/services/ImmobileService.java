@@ -8,6 +8,7 @@ import giuseppetuccilli.Capstone.Gestionale.Immobili.exceptions.BadRequestExcept
 import giuseppetuccilli.Capstone.Gestionale.Immobili.exceptions.NotFoundException;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.NewImmoPayload;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.*;
+import giuseppetuccilli.Capstone.Gestionale.Immobili.specifications.ImmobileSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -129,10 +130,10 @@ public class ImmobileService {
         }
     }
 
-    public Page<Immobile> findAll(int pageNumber, int pageSize, String sortBy) {
+    public Page<Immobile> findAll(int pageNumber, int pageSize, String sortBy, String provincia, String comune, String indirizzo) {
         if (pageSize > 20) pageSize = 20;
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).ascending());
-        return this.immRepo.findAll(pageable);
+        return this.immRepo.findAll(ImmobileSpecification.filtra(provincia, comune, indirizzo), pageable);
     }
 
     public Immobile salvaImmobile(NewImmoPayload payload) {

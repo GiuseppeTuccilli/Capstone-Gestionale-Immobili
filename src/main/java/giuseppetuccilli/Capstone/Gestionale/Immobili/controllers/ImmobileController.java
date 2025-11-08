@@ -41,6 +41,19 @@ public class ImmobileController {
         return immobileService.findById(id);
     }
 
+    //filtra immobili
+    @GetMapping
+    public Page<Immobile> filtraImmobili(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(required = false) String provincia,
+            @RequestParam(required = false) String comune,
+            @RequestParam(required = false) String indirizzo
+    ) {
+        return immobileService.findAll(page, size, sortBy, provincia, comune, indirizzo);
+    }
+
     //creazione immobile
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
