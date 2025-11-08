@@ -9,7 +9,12 @@ import giuseppetuccilli.Capstone.Gestionale.Immobili.exceptions.UnauthorizedExce
 import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.LoginRequest;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.RegistUtentePayload;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.UtenteRepo;
+import giuseppetuccilli.Capstone.Gestionale.Immobili.specifications.UtenteSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +36,12 @@ public class AuthService {
         } else {
             throw new NotFoundException(id);
         }
+    }
+
+    public Page<Utente> findAll(int pageNumber, int pageSize, String sortBy, String nome, String cognome) {
+        if (pageSize > 20) pageSize = 20;
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).descending());
+        return this.utenteRepo.findAll(UtenteSpecification.filtra(nome, cognome), pageable);
     }
 
     public Utente findByEmail(String email) {
@@ -70,4 +81,16 @@ public class AuthService {
             throw new UnauthorizedException("credenziali non corrette");
         }
     }
+
+    //admin può rendere admin uno user
+    public Utente setToAdmin(long id) {
+        Utente found = this.findById(id);
+        if (found.getRuolo() == RuoliUtente.ADMIN) {
+            throw new BadRequestException("questo utente ha già il ruolo ADMIN");
+        }
+        found.setRuolo(RuoliUtente.ADMIN);
+        return utenteRepo.save(found);
+    }
+
+
 }
