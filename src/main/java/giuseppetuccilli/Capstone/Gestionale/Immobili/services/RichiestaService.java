@@ -40,7 +40,7 @@ public class RichiestaService {
 
     public Page<Richiesta> findAll(int pageNumber, int pageSize, String sortBy) {
         if (pageSize > 20) pageSize = 20;
-        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).ascending());
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).descending());
         return this.richiestaRepo.findAll(pageable);
     }
 

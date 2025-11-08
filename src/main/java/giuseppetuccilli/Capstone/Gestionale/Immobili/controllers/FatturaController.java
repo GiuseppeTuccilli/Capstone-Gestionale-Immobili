@@ -6,6 +6,7 @@ import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.NewFattur
 import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.responses.FatturaResDTO;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.services.FatturaService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
@@ -34,6 +35,15 @@ public class FatturaController {
         }
         Fattura f = fatturaService.salvaFattura(body);
         return new FatturaResDTO(f.getNumero(), f.getCausale(), f.getImporto(), f.getData(), f.getCliente().getId());
+    }
+
+    @GetMapping
+    public Page<Fattura> getFatture(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "data") String sortBy
+    ) {
+        return fatturaService.findAll(size, page, sortBy);
     }
 
     @GetMapping("/{numero}")

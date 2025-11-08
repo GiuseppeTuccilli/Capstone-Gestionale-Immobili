@@ -8,6 +8,10 @@ import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.NewFattur
 import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.ClienteRepo;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.FatturaRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -40,6 +44,13 @@ public class FatturaService {
         } catch (Exception ex) {
             throw new BadRequestException("data non valida");
         }
+    }
+
+
+    public Page<Fattura> findAll(int pageSize, int pageNumber, String sortBy) {
+        if (pageSize > 20) pageSize = 20;
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).descending());
+        return fatturaRepo.findAll(pageable);
     }
 
     public Fattura findById(long id) {

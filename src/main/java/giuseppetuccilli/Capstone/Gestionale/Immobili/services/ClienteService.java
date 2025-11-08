@@ -42,7 +42,7 @@ public class ClienteService {
 
     public Page<Cliente> findAll(int pageNumber, int pageSize, String sortBy, String nome, String cognome) {
         if (pageSize > 20) pageSize = 20;
-        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).ascending());
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).descending());
         return this.clienteRepo.findAll(ClienteSpecification.filtra(nome, cognome), pageable);
     }
 
