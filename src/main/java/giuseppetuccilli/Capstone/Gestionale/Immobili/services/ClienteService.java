@@ -9,6 +9,7 @@ import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.NewClient
 import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.ClienteRepo;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.FatturaRepo;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.VisitaRepo;
+import giuseppetuccilli.Capstone.Gestionale.Immobili.specifications.ClienteSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -39,10 +40,10 @@ public class ClienteService {
         }
     }
 
-    public Page<Cliente> findAll(int pageNumber, int pageSize, String sortBy) {
+    public Page<Cliente> findAll(int pageNumber, int pageSize, String sortBy, String nome, String cognome) {
         if (pageSize > 20) pageSize = 20;
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).ascending());
-        return this.clienteRepo.findAll(pageable);
+        return this.clienteRepo.findAll(ClienteSpecification.filtra(nome, cognome), pageable);
     }
 
     public Cliente salvaCliente(NewClientePayload payload) {

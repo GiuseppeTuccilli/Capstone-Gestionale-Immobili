@@ -53,6 +53,18 @@ public class ClienteController {
 
     }
 
+    //filtra clienti
+    @GetMapping
+    public Page<Cliente> filtraClienti(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(required = false) String nome,
+            @RequestParam(required = false) String cognome
+    ) {
+        return clienteService.findAll(page, size, sortBy, nome, cognome);
+    }
+
     //dettagli cliente
     @GetMapping("/{id}")
     public Cliente getCliente(@PathVariable long id) {
