@@ -5,7 +5,6 @@ import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Visita;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.exceptions.BadRequestException;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.exceptions.ValidazioneFallitaExeption;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.NewVisitaPayload;
-import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.responses.VisitaResDTO;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.services.VisitaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -39,8 +38,10 @@ public class VisitaController {
     }
 
     @GetMapping("/mieVisite")
-    public List<VisitaResDTO> getVisiteUtente(@AuthenticationPrincipal Utente utLoggato) {
+    public List<Visita> getVisiteUtente(@AuthenticationPrincipal Utente utLoggato) {
         List<Visita> visite = visitaService.findByUtente(utLoggato.getId());
+        return visite;
+        /*
         List<VisitaResDTO> res = new ArrayList<>();
         if (!visite.isEmpty()) {
             for (int i = 0; i < visite.size(); i++) {
@@ -49,7 +50,7 @@ public class VisitaController {
                 res.add(resItem);
             }
         }
-        return res;
+        return res;*/
     }
 
     @DeleteMapping("/mieVisite/{id}")
