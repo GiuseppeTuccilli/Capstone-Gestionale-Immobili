@@ -107,7 +107,7 @@ public class ClienteController {
         return new RichiestaResDTO(r.getId(), r.getPrezzoMassimo(), r.getSuperficieMinimo(),
                 r.getSuperficieMassimo(), r.getVaniMinimo(), r.getVaniMassimo(), r.getLocaliMinimo(),
                 r.getLocaliMassimo(), r.getComune(), r.getProvincia(), r.isCantina(), r.isAscensore(),
-                r.isPostoAuto(), r.isGiardinoPrivato(), r.isTerrazzo(), r.isArredato(), r.getCliente().getId());
+                r.isPostoAuto(), r.isGiardinoPrivato(), r.isTerrazzo(), r.isArredato(), r.getCliente().getId(), r.getData());
 
     }
 
@@ -121,7 +121,7 @@ public class ClienteController {
             RichiestaResDTO resItem = new RichiestaResDTO(r.getId(), r.getPrezzoMassimo(), r.getSuperficieMinimo(),
                     r.getSuperficieMassimo(), r.getVaniMinimo(), r.getVaniMassimo(), r.getLocaliMinimo(),
                     r.getLocaliMassimo(), r.getComune(), r.getProvincia(), r.isCantina(), r.isAscensore(),
-                    r.isPostoAuto(), r.isGiardinoPrivato(), r.isTerrazzo(), r.isArredato(), r.getCliente().getId());
+                    r.isPostoAuto(), r.isGiardinoPrivato(), r.isTerrazzo(), r.isArredato(), r.getCliente().getId(), r.getData());
             res.add(resItem);
         }
         return res;

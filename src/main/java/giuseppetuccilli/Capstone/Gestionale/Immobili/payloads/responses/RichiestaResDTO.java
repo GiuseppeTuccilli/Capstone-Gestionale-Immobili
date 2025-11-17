@@ -1,5 +1,7 @@
 package giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.responses;
 
+import java.time.LocalDate;
+
 public record RichiestaResDTO(
         long id,
         double prezzoMassimo,
@@ -17,6 +19,7 @@ public record RichiestaResDTO(
         boolean giardinoPrivato,
         boolean terrazzo,
         boolean arredato,
-        long idCliente
+        long idCliente,
+        LocalDate data
 ) {
 }

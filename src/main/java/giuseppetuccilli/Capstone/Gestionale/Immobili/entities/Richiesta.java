@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
+
 @Entity
 @Table(name = "richieste")
 @NoArgsConstructor
@@ -31,6 +33,7 @@ public class Richiesta {
     private boolean arredato;
     private String comune;
     private String provincia;
+    private LocalDate data;
 
     @ManyToOne
     @JoinColumn(name = "id_cliente")
@@ -56,6 +59,7 @@ public class Richiesta {
         this.comune = comune;
         this.provincia = provincia;
         this.cliente = cliente;
+        this.data = LocalDate.now();
     }
 
     @Override
