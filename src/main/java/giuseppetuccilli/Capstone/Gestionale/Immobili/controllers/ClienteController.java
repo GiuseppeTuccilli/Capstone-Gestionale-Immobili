@@ -144,14 +144,12 @@ public class ClienteController {
 
     //get visite cliente
     @GetMapping("/{id}/visite")
-    @PreAuthorize("hasAnyAuthority('ADMIN')")
-    public Page<Visita> getVisiteCliente(
-            @PathVariable long id,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "data") String sortBy
+
+    public List<Visita> getVisiteCliente(
+            @PathVariable long id
+
     ) {
-        return visitaService.findByCliente(id, page, size, sortBy);
+        return visitaService.findByCliente(id);
     }
 
 

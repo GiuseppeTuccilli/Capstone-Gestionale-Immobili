@@ -60,9 +60,8 @@ public class VisitaService {
         return this.visitaRepo.findAll(pageable);
     }
 
-    public Page<Visita> findByImmobile(long idImmobile, int pageNumber, int pageSize, String sortBy) {
-        if (pageSize > 20) pageSize = 20;
-        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).ascending());
+    public List<Visita> findByImmobile(long idImmobile) {
+       
         Optional<Immobile> found = immobileRepo.findById(idImmobile);
         Immobile i;
         if (found.isPresent()) {
@@ -70,12 +69,11 @@ public class VisitaService {
         } else {
             throw new NotFoundException(idImmobile);
         }
-        return this.visitaRepo.findByImmobile(i, pageable);
+        return this.visitaRepo.findByImmobile(i);
     }
 
-    public Page<Visita> findByCliente(long idCliente, int pageNumber, int pageSize, String sortBy) {
-        if (pageSize > 20) pageSize = 20;
-        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).ascending());
+    public List<Visita> findByCliente(long idCliente) {
+
         Optional<Cliente> found = clienteRepo.findById(idCliente);
         Cliente c;
         if (found.isPresent()) {
@@ -83,7 +81,7 @@ public class VisitaService {
         } else {
             throw new NotFoundException(idCliente);
         }
-        return visitaRepo.findByCliente(c, pageable);
+        return visitaRepo.findByCliente(c);
 
     }
 

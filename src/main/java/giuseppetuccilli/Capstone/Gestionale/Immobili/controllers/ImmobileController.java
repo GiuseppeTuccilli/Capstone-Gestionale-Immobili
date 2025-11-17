@@ -121,13 +121,11 @@ public class ImmobileController {
 
     //visite immobile
     @GetMapping("/{id}/visite")
-    public Page<Visita> getVisiteImmobile(
-            @PathVariable long id,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "data") String sortBy
+    public List<Visita> getVisiteImmobile(
+            @PathVariable long id
+
     ) {
-        return visitaService.findByImmobile(id, page, size, sortBy);
+        return visitaService.findByImmobile(id);
     }
 
 
