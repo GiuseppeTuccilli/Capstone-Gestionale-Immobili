@@ -8,7 +8,8 @@ public class ImmobileSpecification {
     public static Specification<Immobile> filtra(
             String provincia,
             String comune,
-            String indirizzo
+            String indirizzo,
+            String tipo
     ) {
         return (root, query, cb) -> {
             Predicate predicate = cb.conjunction();
@@ -25,6 +26,10 @@ public class ImmobileSpecification {
             if (comune != null && !comune.isEmpty()) {
                 predicate = cb.and(predicate, cb.like(cb.lower(root.get("comune").get("denominazione")),
                         "%" + comune.toLowerCase() + "%"));
+            }
+
+            if (tipo != null && !tipo.isEmpty()) {
+                predicate = cb.and(predicate, cb.like(root.get("MacroTipologia"), tipo));
             }
             return predicate;
 

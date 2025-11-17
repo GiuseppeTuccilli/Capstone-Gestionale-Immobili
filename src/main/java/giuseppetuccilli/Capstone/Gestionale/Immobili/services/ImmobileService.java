@@ -130,10 +130,10 @@ public class ImmobileService {
         }
     }
 
-    public Page<Immobile> findAll(int pageNumber, int pageSize, String sortBy, String provincia, String comune, String indirizzo) {
+    public Page<Immobile> findAll(int pageNumber, int pageSize, String sortBy, String provincia, String comune, String indirizzo, String tipo) {
         if (pageSize > 20) pageSize = 20;
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).ascending());
-        return this.immRepo.findAll(ImmobileSpecification.filtra(provincia, comune, indirizzo), pageable);
+        return this.immRepo.findAll(ImmobileSpecification.filtra(provincia, comune, indirizzo, tipo), pageable);
     }
 
     public Immobile salvaImmobile(NewImmoPayload payload) {
