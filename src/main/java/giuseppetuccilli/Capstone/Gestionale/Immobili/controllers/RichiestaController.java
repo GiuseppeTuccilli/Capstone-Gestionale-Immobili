@@ -5,7 +5,6 @@ import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Richiesta;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.services.ImmobileService;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.services.RichiestaService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,7 +25,7 @@ public class RichiestaController {
 
     //cancellazione richiesta
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ADMIN')")
+   
     public void cancellaRichiesta(@PathVariable long id) {
         richiestaService.cancellaRichiesta(id);
     }
