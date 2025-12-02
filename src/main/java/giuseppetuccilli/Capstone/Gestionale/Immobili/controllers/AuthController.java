@@ -36,7 +36,7 @@ public class AuthController {
             throw new ValidazioneFallitaExeption(errList);
         }
         RegistUtentePayload utToSave = new RegistUtentePayload(payload.nome(), payload.cognome(), payload.email(), bCrypt.encode(payload.password()), payload.telefono());
-        Utente u = authService.salvaUtente(utToSave);
+        Utente u = authService.salvaAdmin(utToSave);
         return new UtenteResponsePayload(u.getId(), u.getNome(), u.getCognome());
 
     }
