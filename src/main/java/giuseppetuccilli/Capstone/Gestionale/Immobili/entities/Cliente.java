@@ -1,9 +1,6 @@
 package giuseppetuccilli.Capstone.Gestionale.Immobili.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,11 +22,16 @@ public class Cliente {
     private String indirizzo;
     private String email;
 
-    public Cliente(String nome, String cognome, String telefono, String indirizzo, String email) {
+    @ManyToOne
+    @JoinColumn(name = "id_utente")
+    private Utente utente;
+
+    public Cliente(String nome, String cognome, String telefono, String indirizzo, String email, Utente utente) {
         this.nome = nome;
         this.cognome = cognome;
         this.telefono = telefono;
         this.indirizzo = indirizzo;
         this.email = email;
+        this.utente = utente;
     }
 }

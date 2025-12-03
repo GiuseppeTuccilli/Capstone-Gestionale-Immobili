@@ -36,6 +36,10 @@ public class Immobile {
     @JoinColumn(name = "id_comune")
     private Comune comune;
 
+    @ManyToOne
+    @JoinColumn(name = "id_ditta")
+    private Ditta ditta;
+
     /*
         @OneToMany(mappedBy = "immobile")
         private List<FotoImmobile> foto;
@@ -43,7 +47,7 @@ public class Immobile {
     public Immobile(MacroTipologiaImmobile macroTipologia, double superficie, int locali, int vani,
                     String descrizione, double prezzo, boolean cantina, boolean ascensore,
                     boolean postoAuto, boolean giardinoPrivato, boolean terrazzo, boolean arredato,
-                    String indirizzo, Comune comune) {
+                    String indirizzo, Comune comune, Ditta ditta) {
         MacroTipologia = macroTipologia;
         this.superficie = superficie;
         this.locali = locali;
@@ -58,6 +62,7 @@ public class Immobile {
         this.arredato = arredato;
         this.indirizzo = indirizzo;
         this.comune = comune;
+        this.ditta = ditta;
 
     }
 

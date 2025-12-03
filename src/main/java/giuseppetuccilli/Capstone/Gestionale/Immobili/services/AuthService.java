@@ -1,6 +1,7 @@
 package giuseppetuccilli.Capstone.Gestionale.Immobili.services;
 
 import giuseppetuccilli.Capstone.Gestionale.Immobili.configs.security.JWTTools;
+import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Ditta;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Utente;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Visita;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.enums.RuoliUtente;
@@ -10,6 +11,7 @@ import giuseppetuccilli.Capstone.Gestionale.Immobili.exceptions.UnauthorizedExce
 import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.LoginRequest;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.NewPasswordPayload;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.RegistUtentePayload;
+import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.DittaRepo;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.UtenteRepo;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.VisitaRepo;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.specifications.UtenteSpecification;
@@ -34,6 +36,8 @@ public class AuthService {
     private JWTTools jwtTools;
     @Autowired
     private VisitaRepo visitaRepo;
+    @Autowired
+    private DittaRepo dittaRepo;
 
     public Utente findById(long id) {
         Optional<Utente> found = utenteRepo.findById(id);
@@ -44,10 +48,10 @@ public class AuthService {
         }
     }
 
-    public Page<Utente> findAll(int pageNumber, int pageSize, String sortBy, String nome, String cognome) {
+    public Page<Utente> findAll(int pageNumber, int pageSize, String sortBy, String nome, String cognome, long idDitta) {
         if (pageSize > 20) pageSize = 20;
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).descending());
-        return this.utenteRepo.findAll(UtenteSpecification.filtra(nome, cognome), pageable);
+        return this.utenteRepo.findAll(UtenteSpecification.filtra(nome, cognome, idDitta), pageable);
     }
 
     public Utente findByEmail(String email) {
@@ -59,22 +63,25 @@ public class AuthService {
         }
     }
 
-    public Utente salvaUtente(RegistUtentePayload payload) {
-        Optional<Utente> foundAllready = utenteRepo.findByEmail(payload.email());
-        if (foundAllready.isPresent()) {
-            throw new BadRequestException("l'email " + payload.email() + " è già in uso");
+    /*
+        public Utente salvaUtente(RegistUtentePayload payload) {
+            Optional<Utente> foundAllready = utenteRepo.findByEmail(payload.email());
+            if (foundAllready.isPresent()) {
+                throw new BadRequestException("l'email " + payload.email() + " è già in uso");
+            }
+            Utente utente = new Utente(payload.nome(), payload.cognome(), payload.email(), payload.password(), payload.telefono(), RuoliUtente.USER);
+            Utente u = utenteRepo.save(utente);
+            return u;
         }
-        Utente utente = new Utente(payload.nome(), payload.cognome(), payload.email(), payload.password(), payload.telefono(), RuoliUtente.USER);
-        Utente u = utenteRepo.save(utente);
-        return u;
-    }
-
+    */
     public Utente salvaAdmin(RegistUtentePayload payload) {
         Optional<Utente> foundAllready = utenteRepo.findByEmail(payload.email());
         if (foundAllready.isPresent()) {
             throw new BadRequestException("l'email " + payload.email() + " è già in uso");
         }
-        Utente utente = new Utente(payload.nome(), payload.cognome(), payload.email(), payload.password(), payload.telefono(), RuoliUtente.ADMIN);
+        Ditta ditta = new Ditta();
+        Ditta d = dittaRepo.save(ditta);
+        Utente utente = new Utente(payload.nome(), payload.cognome(), payload.email(), payload.password(), payload.telefono(), RuoliUtente.ADMIN, d);
         Utente u = utenteRepo.save(utente);
         return u;
     }

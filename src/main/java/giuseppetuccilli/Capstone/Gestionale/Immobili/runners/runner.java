@@ -1,10 +1,6 @@
 package giuseppetuccilli.Capstone.Gestionale.Immobili.runners;
 
 import giuseppetuccilli.Capstone.Gestionale.Immobili.importazione.CsvImportService;
-import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.NewClientePayload;
-import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.NewImmoPayload;
-import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.NewRichiestaPayload;
-import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.RegistUtentePayload;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.*;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.services.AuthService;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.services.ClienteService;
@@ -17,8 +13,6 @@ import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 
 @Component
 public class runner implements CommandLineRunner {
@@ -61,7 +55,7 @@ public class runner implements CommandLineRunner {
             importService.salvaComuni(comunePath);
             System.out.println("tutto bene comuni");
         }
-
+/*
 
         NewImmoPayload imPay = new NewImmoPayload("entità urbana", 100, 5, 5, "descrizione immobile di prova 1", 100000, "indirizzo di prova n 1", "Esperia", false, true, false, false, false, true);
         NewImmoPayload imPay2 = new NewImmoPayload("entità urbana", 150, 10, 6, "descrizione immobile di prova 2", 150000, "indirizzo di prova n 2", "Pontecorvo", true, true, true, false, false, true);
@@ -110,6 +104,6 @@ public class runner implements CommandLineRunner {
             authService.salvaUtente(ut2);
         }
 
-
+*/
     }
 }

@@ -33,13 +33,18 @@ public class Utente implements UserDetails {
     @Enumerated(EnumType.STRING)
     private RuoliUtente ruolo;
 
-    public Utente(String nome, String cognome, String email, String password, String telefono, RuoliUtente ruolo) {
+    @ManyToOne
+    @JoinColumn(name = "id_ditta")
+    private Ditta ditta;
+
+    public Utente(String nome, String cognome, String email, String password, String telefono, RuoliUtente ruolo, Ditta ditta) {
         this.nome = nome;
         this.cognome = cognome;
         this.email = email;
         this.password = password;
         this.telefono = telefono;
         this.ruolo = ruolo;
+        this.ditta = ditta;
     }
 
     @Override

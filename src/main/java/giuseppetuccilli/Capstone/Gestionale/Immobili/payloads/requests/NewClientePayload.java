@@ -17,6 +17,7 @@ public record NewClientePayload(
         @NotBlank
         @Email
         String email
-        
+
+
 ) {
 }

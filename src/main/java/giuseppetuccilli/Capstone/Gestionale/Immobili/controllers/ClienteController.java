@@ -1,9 +1,6 @@
 package giuseppetuccilli.Capstone.Gestionale.Immobili.controllers;
 
-import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Cliente;
-import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Fattura;
-import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Richiesta;
-import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Visita;
+import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.*;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.exceptions.ValidazioneFallitaExeption;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.NewClientePayload;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.NewRichiestaPayload;
@@ -18,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -39,7 +37,7 @@ public class ClienteController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ClienteResDTO creaCliente(@RequestBody @Validated NewClientePayload body, BindingResult valRes) {
+    public ClienteResDTO creaCliente(@RequestBody @Validated NewClientePayload body, BindingResult valRes, @AuthenticationPrincipal Utente loggato) {
         if (valRes.hasErrors()) {
             List<String> errList = new ArrayList<>();
             for (int i = 0; i < valRes.getFieldErrors().size(); i++) {
@@ -47,7 +45,7 @@ public class ClienteController {
             }
             throw new ValidazioneFallitaExeption(errList);
         }
-        Cliente c = clienteService.salvaCliente(body);
+        Cliente c = clienteService.salvaCliente(body, loggato);
         return new ClienteResDTO(c.getId(), c.getNome(), c.getCognome());
 
 
@@ -60,20 +58,23 @@ public class ClienteController {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(required = false) String nome,
-            @RequestParam(required = false) String cognome
+            @RequestParam(required = false) String cognome,
+            @AuthenticationPrincipal Utente loggato
     ) {
-        return clienteService.findAll(page, size, sortBy, nome, cognome);
+        Ditta d = loggato.getDitta();
+        return clienteService.findAll(page, size, sortBy, nome, cognome, d.getId());
     }
 
     //dettagli cliente
     @GetMapping("/{id}")
-    public Cliente getCliente(@PathVariable long id) {
-        return clienteService.findById(id);
+    public Cliente getCliente(@PathVariable long id, @AuthenticationPrincipal Utente loggato) {
+        Ditta d = loggato.getDitta();
+        return clienteService.findById(id, d.getId());
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('ADMIN')")
-    public ClienteResDTO modificaCliente(@RequestBody @Validated NewClientePayload body, BindingResult valRes, @PathVariable long id) {
+    public ClienteResDTO modificaCliente(@RequestBody @Validated NewClientePayload body, BindingResult valRes, @PathVariable long id, @AuthenticationPrincipal Utente loggato) {
         if (valRes.hasErrors()) {
             List<String> errList = new ArrayList<>();
             for (int i = 0; i < valRes.getFieldErrors().size(); i++) {
@@ -81,15 +82,17 @@ public class ClienteController {
             }
             throw new ValidazioneFallitaExeption(errList);
         }
-        Cliente c = clienteService.modificaCliente(body, id);
+        Ditta d = loggato.getDitta();
+        Cliente c = clienteService.modificaCliente(body, id, d.getId());
         return new ClienteResDTO(c.getId(), c.getNome(), c.getCognome());
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void cancellaCliente(@PathVariable long id) {
-        clienteService.cancellaCliente(id);
+    public void cancellaCliente(@PathVariable long id, @AuthenticationPrincipal Utente loggato) {
+        Ditta d = loggato.getDitta();
+        clienteService.cancellaCliente(id, d.getId());
     }
 
     //nuova richiesta

@@ -9,10 +9,15 @@ public class ImmobileSpecification {
             String provincia,
             String comune,
             String indirizzo,
-            String tipo
+            String tipo,
+            long idDitta
+
     ) {
         return (root, query, cb) -> {
             Predicate predicate = cb.conjunction();
+
+            predicate = cb.and(predicate, cb.equal(root.get("ditta").get("id"), idDitta));
+
 
             if (indirizzo != null && !indirizzo.isEmpty()) {
                 predicate = cb.and(predicate, cb.like(cb.lower(root.get("indirizzo")), "%" + indirizzo.toLowerCase() + "%"));

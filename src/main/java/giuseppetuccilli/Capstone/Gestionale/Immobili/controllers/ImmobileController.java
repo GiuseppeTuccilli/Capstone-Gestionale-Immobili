@@ -1,9 +1,6 @@
 package giuseppetuccilli.Capstone.Gestionale.Immobili.controllers;
 
-import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.FotoImmobile;
-import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Immobile;
-import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Richiesta;
-import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Visita;
+import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.*;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.exceptions.ValidazioneFallitaExeption;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.NewImmoPayload;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.responses.FotoForListDTO;
@@ -15,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -37,8 +35,9 @@ public class ImmobileController {
 
     //dettagli immobile
     @GetMapping("/{id}")
-    public Immobile getIDettImmobile(@PathVariable long id) {
-        return immobileService.findById(id);
+    public Immobile getIDettImmobile(@PathVariable long id, @AuthenticationPrincipal Utente loggato) {
+        Ditta d = loggato.getDitta();
+        return immobileService.findById(id, d.getId());
     }
 
     //filtra immobili
@@ -50,16 +49,19 @@ public class ImmobileController {
             @RequestParam(required = false) String provincia,
             @RequestParam(required = false) String comune,
             @RequestParam(required = false) String indirizzo,
-            @RequestParam(required = false) String tipo
+            @RequestParam(required = false) String tipo,
+            @AuthenticationPrincipal Utente loggato
     ) {
-        return immobileService.findAll(page, size, sortBy, provincia, comune, indirizzo, tipo);
+        Ditta d = loggato.getDitta();
+        return immobileService.findAll(page, size, sortBy, provincia, comune, indirizzo, tipo, d.getId());
     }
 
     //creazione immobile
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasAnyAuthority('ADMIN')")
-    public Immobile nuovoImmobile(@RequestBody @Validated NewImmoPayload body, BindingResult valRes) {
+    public Immobile nuovoImmobile(@RequestBody @Validated NewImmoPayload body, BindingResult valRes, @AuthenticationPrincipal Utente loggato
+    ) {
         if (valRes.hasErrors()) {
             List<String> errList = new ArrayList<>();
             for (int i = 0; i < valRes.getFieldErrors().size(); i++) {
@@ -67,7 +69,8 @@ public class ImmobileController {
             }
             throw new ValidazioneFallitaExeption(errList);
         }
-        Immobile i = immobileService.salvaImmobile(body);
+
+        Immobile i = immobileService.salvaImmobile(body, loggato.getDitta());
         return i;
     }
 
@@ -75,8 +78,9 @@ public class ImmobileController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAnyAuthority('ADMIN')")
-    public void cancellaImmobile(@PathVariable long id) {
-        immobileService.cancellaImmobile(id);
+    public void cancellaImmobile(@PathVariable long id, @AuthenticationPrincipal Utente loggato) {
+        Ditta d = loggato.getDitta();
+        immobileService.cancellaImmobile(id, d.getId());
     }
 
     //richieste compatibili immobile
@@ -89,17 +93,19 @@ public class ImmobileController {
     @PostMapping("/{id}/foto")
     @PreAuthorize("hasAnyAuthority('ADMIN')")
     @ResponseStatus(HttpStatus.CREATED)
-    public Immobile caricaFoto(@PathVariable long id, @RequestParam("foto") MultipartFile file) {
+    public Immobile caricaFoto(@PathVariable long id, @RequestParam("foto") MultipartFile file, @AuthenticationPrincipal Utente loggato) {
+        Ditta d = loggato.getDitta();
         System.out.println(file.getOriginalFilename());
-        return immobileService.aggiungiFoto(id, file);
+        return immobileService.aggiungiFoto(id, file, d.getId());
     }
 
     //cancella foto
     @DeleteMapping("/{id}/foto/{idFoto}")
     @PreAuthorize("hasAnyAuthority('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void cancellaFoto(@PathVariable long id, @PathVariable long idFoto) {
-        immobileService.cancellaFoto(id, idFoto);
+    public void cancellaFoto(@PathVariable long id, @PathVariable long idFoto, @AuthenticationPrincipal Utente loggato) {
+        Ditta d = loggato.getDitta();
+        immobileService.cancellaFoto(id, idFoto, d.getId());
     }
 
     //lista foto immobile

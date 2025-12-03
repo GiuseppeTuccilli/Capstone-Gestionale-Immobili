@@ -42,18 +42,26 @@ public class ImmobileService {
     private ProvinciaRepo provinciaRepo;
     @Autowired
     private Cloudinary imageUploader;
+    @Autowired
+    private DittaRepo dittaRepo;
 
-    public Immobile findById(long id) {
+    public Immobile findById(long id, long idDitta) {
         Optional<Immobile> found = immRepo.findById(id);
         if (found.isPresent()) {
-            return found.get();
+            Immobile im = found.get();
+            long dittaImmobile = im.getDitta().getId();
+            if (dittaImmobile != idDitta) {
+                throw new BadRequestException("non puoi accedere a questo immobile");
+            } else {
+                return im;
+            }
         } else {
             throw new NotFoundException(id);
         }
     }
 
     private void salvaIncroci(Immobile imFromDb) {
-        List<Richiesta> richieste = richiestaRepo.findAll();
+        List<Richiesta> richieste = richiestaRepo.findByDitta(imFromDb.getDitta());
         if (!richieste.isEmpty()) {
             for (int i = 0; i < richieste.size(); i++) {
                 Richiesta r = richieste.get(i);
@@ -130,13 +138,13 @@ public class ImmobileService {
         }
     }
 
-    public Page<Immobile> findAll(int pageNumber, int pageSize, String sortBy, String provincia, String comune, String indirizzo, String tipo) {
+    public Page<Immobile> findAll(int pageNumber, int pageSize, String sortBy, String provincia, String comune, String indirizzo, String tipo, long idDitta) {
         if (pageSize > 20) pageSize = 20;
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).ascending());
-        return this.immRepo.findAll(ImmobileSpecification.filtra(provincia, comune, indirizzo, tipo), pageable);
+        return this.immRepo.findAll(ImmobileSpecification.filtra(provincia, comune, indirizzo, tipo, idDitta), pageable);
     }
 
-    public Immobile salvaImmobile(NewImmoPayload payload) {
+    public Immobile salvaImmobile(NewImmoPayload payload, Ditta ditta) {
         MacroTipologiaImmobile macTipo;
         switch (payload.macroTipo().toLowerCase()) {
             case "destinazione ordinaria":
@@ -187,7 +195,7 @@ public class ImmobileService {
         Immobile im = new Immobile(macTipo, payload.superficie(), payload.locali(),
                 payload.vani(), payload.descrizione(), payload.prezzo(), payload.cantina(),
                 payload.ascensore(), payload.postoAuto(), payload.giardinoPrivato(), payload.terrazzo(),
-                payload.arredato(), payload.indirizzo(), comune);
+                payload.arredato(), payload.indirizzo(), comune, ditta);
 
         Immobile imFromDb = immRepo.save(im);
 
@@ -197,8 +205,8 @@ public class ImmobileService {
 
     }
 
-    public Immobile modificaImmobile(NewImmoPayload payload, long imId) {
-        Immobile found = this.findById(imId);
+    public Immobile modificaImmobile(NewImmoPayload payload, long imId, long idDitta) {
+        Immobile found = this.findById(imId, idDitta);
         MacroTipologiaImmobile macTipo;
         switch (payload.macroTipo().toLowerCase()) {
             case "destinazione ordinaria":
@@ -286,8 +294,8 @@ public class ImmobileService {
     }
 
 
-    public void cancellaImmobile(long id) {
-        Immobile found = this.findById(id);
+    public void cancellaImmobile(long id, long idDitta) {
+        Immobile found = this.findById(id, idDitta);
 
         //cancellazione incroci
         List<Incrocio> incrociPrec = incrocioRepo.findByImmobile(found);
@@ -316,8 +324,8 @@ public class ImmobileService {
         immRepo.delete(found);
     }
 
-    public Immobile aggiungiFoto(long id, MultipartFile file) {
-        Immobile found = this.findById(id);
+    public Immobile aggiungiFoto(long id, MultipartFile file, long idDitta) {
+        Immobile found = this.findById(id, idDitta);
 
         //controllo che il file non sia vuoto
         if (file.isEmpty()) {
@@ -346,8 +354,8 @@ public class ImmobileService {
         }
     }
 
-    public void cancellaFoto(long idIm, long idFoto) {
-        Immobile i = this.findById(idIm);
+    public void cancellaFoto(long idIm, long idFoto, long idDitta) {
+        Immobile i = this.findById(idIm, idDitta);
         List<FotoImmobile> fotoList = fotoImmobileRepo.findByImmobile(i);
         Optional<FotoImmobile> found = fotoImmobileRepo.findById(idFoto);
         FotoImmobile f;

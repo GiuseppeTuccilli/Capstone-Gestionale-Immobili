@@ -1,5 +1,6 @@
 package giuseppetuccilli.Capstone.Gestionale.Immobili.controllers;
 
+import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Ditta;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Utente;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.exceptions.ValidazioneFallitaExeption;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.NewPasswordPayload;
@@ -30,9 +31,11 @@ public class UserController {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(required = false) String nome,
-            @RequestParam(required = false) String cognome
+            @RequestParam(required = false) String cognome,
+            @AuthenticationPrincipal Utente loggato
     ) {
-        return authService.findAll(page, size, sortBy, nome, cognome);
+        Ditta d = loggato.getDitta();
+        return authService.findAll(page, size, sortBy, nome, cognome, d.getId());
     }
 
     //set to admin

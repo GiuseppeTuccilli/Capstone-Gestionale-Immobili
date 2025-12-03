@@ -7,10 +7,13 @@ import org.springframework.data.jpa.domain.Specification;
 public class UtenteSpecification {
     public static Specification<Utente> filtra(
             String nome,
-            String cognome
+            String cognome,
+            long idDitta
     ) {
         return (root, query, cb) -> {
             Predicate predicate = cb.conjunction();
+
+            predicate = cb.and(predicate, cb.equal(root.get("ditta").get("id"), idDitta));
 
             if (nome != null && !nome.isEmpty()) {
                 predicate = cb.and(predicate, cb.like(cb.lower(root.get("nome")), "%" + nome.toLowerCase() + "&"));

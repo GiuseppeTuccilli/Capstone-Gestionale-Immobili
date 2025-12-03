@@ -1,9 +1,7 @@
 package giuseppetuccilli.Capstone.Gestionale.Immobili.services;
 
-import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Cliente;
-import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Fattura;
-import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Richiesta;
-import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Visita;
+import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.*;
+import giuseppetuccilli.Capstone.Gestionale.Immobili.exceptions.BadRequestException;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.exceptions.NotFoundException;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.NewClientePayload;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.ClienteRepo;
@@ -31,31 +29,37 @@ public class ClienteService {
     @Autowired
     private VisitaRepo visitaRepo;
 
-    public Cliente findById(long id) {
+    public Cliente findById(long id, long idDitta) {
         Optional<Cliente> found = clienteRepo.findById(id);
         if (found.isPresent()) {
-            return found.get();
+            Cliente c = found.get();
+            long dittaCliente = c.getUtente().getDitta().getId();
+            if (dittaCliente != idDitta) {
+                throw new BadRequestException("non puoi accedere a questo cliente");
+            } else {
+                return c;
+            }
         } else {
             throw new NotFoundException(id);
         }
     }
 
-    public Page<Cliente> findAll(int pageNumber, int pageSize, String sortBy, String nome, String cognome) {
+    public Page<Cliente> findAll(int pageNumber, int pageSize, String sortBy, String nome, String cognome, long idDitta) {
         if (pageSize > 20) pageSize = 20;
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).descending());
-        return this.clienteRepo.findAll(ClienteSpecification.filtra(nome, cognome), pageable);
+        return this.clienteRepo.findAll(ClienteSpecification.filtra(nome, cognome, idDitta), pageable);
     }
 
-    public Cliente salvaCliente(NewClientePayload payload) {
+    public Cliente salvaCliente(NewClientePayload payload, Utente u) {
         Cliente cliente = new Cliente(payload.nome(), payload.cognome(), payload.telefono(),
-                payload.indirizzo(), payload.email());
+                payload.indirizzo(), payload.email(), u);
 
         Cliente c = clienteRepo.save(cliente);
         return c;
     }
 
-    public Cliente modificaCliente(NewClientePayload payload, long id) {
-        Cliente found = this.findById(id);
+    public Cliente modificaCliente(NewClientePayload payload, long id, long idDitta) {
+        Cliente found = this.findById(id, idDitta);
         found.setNome(payload.nome());
         found.setCognome(payload.cognome());
         found.setIndirizzo(payload.indirizzo());
@@ -66,8 +70,8 @@ public class ClienteService {
         return c;
     }
 
-    public void cancellaCliente(long id) {
-        Cliente found = this.findById(id);
+    public void cancellaCliente(long id, long idDitta) {
+        Cliente found = this.findById(id, idDitta);
 
         //cancellazione richieste
         List<Richiesta> richieste = richiestaService.findByCliente(found.getId());

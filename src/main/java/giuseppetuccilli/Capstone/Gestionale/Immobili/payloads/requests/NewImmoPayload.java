@@ -21,7 +21,7 @@ public record NewImmoPayload(
         String indirizzo,
         @NotBlank
         String comune,
-        
+
         boolean cantina,
         boolean ascensore,
         boolean postoAuto,
