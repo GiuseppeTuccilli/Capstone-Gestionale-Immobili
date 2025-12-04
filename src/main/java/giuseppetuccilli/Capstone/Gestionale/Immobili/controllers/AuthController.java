@@ -7,6 +7,7 @@ import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.RegistUte
 import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.responses.LoginResponse;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.responses.UtenteResponsePayload;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.services.AuthService;
+import giuseppetuccilli.Capstone.Gestionale.Immobili.services.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,6 +25,9 @@ public class AuthController {
     private AuthService authService;
     @Autowired
     private PasswordEncoder bCrypt;
+    @Autowired
+    private EmailService emailService;
+
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
