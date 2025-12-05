@@ -63,17 +63,18 @@ public class AuthService {
         }
     }
 
-    /*
-        public Utente salvaUtente(RegistUtentePayload payload) {
-            Optional<Utente> foundAllready = utenteRepo.findByEmail(payload.email());
-            if (foundAllready.isPresent()) {
-                throw new BadRequestException("l'email " + payload.email() + " è già in uso");
-            }
-            Utente utente = new Utente(payload.nome(), payload.cognome(), payload.email(), payload.password(), payload.telefono(), RuoliUtente.USER);
-            Utente u = utenteRepo.save(utente);
-            return u;
+
+    public Utente salvaUtente(RegistUtentePayload payload, Utente admin) {
+        Optional<Utente> foundAllready = utenteRepo.findByEmail(payload.email());
+        if (foundAllready.isPresent()) {
+            throw new BadRequestException("l'email " + payload.email() + " è già in uso");
         }
-    */
+        Ditta d = admin.getDitta();
+        Utente utente = new Utente(payload.nome(), payload.cognome(), payload.email(), payload.password(), payload.telefono(), RuoliUtente.USER, d);
+        Utente u = utenteRepo.save(utente);
+        return u;
+    }
+
     public Utente salvaAdmin(RegistUtentePayload payload) {
         Optional<Utente> foundAllready = utenteRepo.findByEmail(payload.email());
         if (foundAllready.isPresent()) {

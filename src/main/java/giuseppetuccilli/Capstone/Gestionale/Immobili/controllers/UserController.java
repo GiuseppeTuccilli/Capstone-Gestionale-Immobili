@@ -4,6 +4,8 @@ import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Ditta;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Utente;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.exceptions.ValidazioneFallitaExeption;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.NewPasswordPayload;
+import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.RegistUtentePayload;
+import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.responses.UtenteResponsePayload;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.services.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -66,12 +68,27 @@ public class UserController {
 
     }
 
-    //cancella utente
+    //cancella me utente
     @DeleteMapping("/me")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void cancellaUtente(@AuthenticationPrincipal Utente loggato) {
         authService.cancellaUtente(loggato.getId());
     }
 
+    //cancella user (da admin)
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void cancellaUtente(@PathVariable long id) {
+        authService.cancellaUtente(id);
+    }
+
+    //crea user stessa ditta
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public UtenteResponsePayload creaUtente(@AuthenticationPrincipal Utente loggato, @RequestBody RegistUtentePayload body) {
+        Utente user = authService.salvaUtente(body, loggato);
+        UtenteResponsePayload res = new UtenteResponsePayload(user.getId(), user.getNome(), user.getCognome());
+        return res;
+    }
 
 }
