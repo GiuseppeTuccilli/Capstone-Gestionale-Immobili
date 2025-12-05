@@ -78,6 +78,7 @@ public class UserController {
     //cancella user (da admin)
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     public void cancellaUtente(@PathVariable long id) {
         authService.cancellaUtente(id);
     }
@@ -85,6 +86,7 @@ public class UserController {
     //crea user stessa ditta
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     public UtenteResponsePayload creaUtente(@AuthenticationPrincipal Utente loggato, @RequestBody RegistUtentePayload body) {
         Utente user = authService.salvaUtente(body, loggato);
         UtenteResponsePayload res = new UtenteResponsePayload(user.getId(), user.getNome(), user.getCognome());
