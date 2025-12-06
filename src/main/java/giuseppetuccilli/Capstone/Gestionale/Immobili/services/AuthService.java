@@ -1,6 +1,7 @@
 package giuseppetuccilli.Capstone.Gestionale.Immobili.services;
 
 import giuseppetuccilli.Capstone.Gestionale.Immobili.configs.security.JWTTools;
+import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.CodiceResetPassword;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Ditta;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Utente;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Visita;
@@ -11,6 +12,7 @@ import giuseppetuccilli.Capstone.Gestionale.Immobili.exceptions.UnauthorizedExce
 import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.LoginRequest;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.NewPasswordPayload;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.RegistUtentePayload;
+import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.CodiceResetPasswordRepo;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.DittaRepo;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.UtenteRepo;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.VisitaRepo;
@@ -23,11 +25,14 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 @Service
 public class AuthService {
+
     @Autowired
     private UtenteRepo utenteRepo;
     @Autowired
@@ -38,6 +43,10 @@ public class AuthService {
     private VisitaRepo visitaRepo;
     @Autowired
     private DittaRepo dittaRepo;
+    @Autowired
+    private EmailService emailService;
+    @Autowired
+    private CodiceResetPasswordRepo codiceResetPasswordRepo;
 
     public Utente findById(long id) {
         Optional<Utente> found = utenteRepo.findById(id);
@@ -124,6 +133,81 @@ public class AuthService {
             }
         }
         utenteRepo.delete(found);
+    }
+
+    //reset password dimenticata
+    //1) invio e salvataggio codice casuale
+    public void inviaCodice(String email) {
+        Optional<Utente> found = utenteRepo.findByEmail(email);
+        Utente u;
+        if (found.isPresent()) {
+            u = found.get();
+        } else {
+            throw new BadRequestException("email non presente nel database");
+        }
+        //cancellazione eventuali altri codici dell'utente
+        List<CodiceResetPassword> listaCodice = codiceResetPasswordRepo.findByUtente(u);
+        if (!listaCodice.isEmpty()) {
+            for (int i = 0; i < listaCodice.size(); i++) {
+                codiceResetPasswordRepo.delete(listaCodice.get(i));
+            }
+        }
+
+        StringBuilder codiceSb = new StringBuilder();
+        String caratteri = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        int indice = 0;
+        int lunghezza = 0;
+        Random rdm = new Random();
+        boolean ok = true;
+        String codice = "";
+
+        while (ok) {
+            lunghezza = rdm.nextInt(3) + 7;
+
+            for (int i = 0; i < lunghezza; i++) {
+                indice = rdm.nextInt(caratteri.length());
+                codiceSb.append(caratteri.charAt(indice));
+            }
+            codice = codiceSb.toString();
+
+            //ripete la pocedura nel remoto caso in cui il codice esista già
+            List<CodiceResetPassword> codiciUguali = codiceResetPasswordRepo.findByCodice(codice);
+            if (codiciUguali.isEmpty()) {
+                ok = false;
+            }
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime scadenza = now.plusHours(1);
+
+        CodiceResetPassword codResetPass = new CodiceResetPassword(codice, scadenza, u);
+        codiceResetPasswordRepo.save(codResetPass);
+
+        String mes = "il tuo codice per il reset della password è: " + codice;
+
+        emailService.inviaEmail(u, "Codice per il reset della password", mes);
+
+    }
+
+    //2) verifica codie e cambio password
+    public void verificaAndResetta(String codice, String newPassword) {
+        List<CodiceResetPassword> codici = codiceResetPasswordRepo.findByCodice(codice);
+        CodiceResetPassword codResPass;
+        if (codici.isEmpty()) {
+            throw new BadRequestException("codice errato");
+        } else {
+            codResPass = codici.getFirst();
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        if (codResPass.getScadenza().isBefore(now)) {
+            throw new BadRequestException("il codice è scaduto");
+        }
+
+        Utente utente = codResPass.getUtente();
+        utente.setPassword(bcrypt.encode(newPassword));
+        utenteRepo.save(utente);
+        codiceResetPasswordRepo.delete(codResPass);
     }
 
 

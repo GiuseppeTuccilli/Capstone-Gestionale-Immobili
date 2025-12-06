@@ -22,6 +22,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/utenti")
 public class UserController {
+
     @Autowired
     private AuthService authService;
 
@@ -92,5 +93,6 @@ public class UserController {
         UtenteResponsePayload res = new UtenteResponsePayload(user.getId(), user.getNome(), user.getCognome());
         return res;
     }
+
 
 }

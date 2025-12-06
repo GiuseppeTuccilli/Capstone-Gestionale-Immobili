@@ -2,8 +2,10 @@ package giuseppetuccilli.Capstone.Gestionale.Immobili.controllers;
 
 import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Utente;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.exceptions.ValidazioneFallitaExeption;
+import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.EmailValidationPayload;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.LoginRequest;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.RegistUtentePayload;
+import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.ResetPasswordPayload;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.responses.LoginResponse;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.responses.UtenteResponsePayload;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.services.AuthService;
@@ -58,5 +60,22 @@ public class AuthController {
         return new LoginResponse(token);
     }
 
+    //reset della password dimenticata
+    //1) invio codice per email
+    @GetMapping("/richiediCodice")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void inviaCodice(@RequestBody EmailValidationPayload body) {
+        String email = body.email();
+        authService.inviaCodice(email);
+    }
+
+    //2) verifica codice e reset password
+    @PatchMapping("/resetPassword")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void VerificaAndReset(@RequestBody ResetPasswordPayload body) {
+        String newPassword = body.newPassword();
+        String codice = body.codice();
+        authService.verificaAndResetta(codice, newPassword);
+    }
 
 }
