@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -367,7 +368,23 @@ public class ImmobileService {
         if (fotoList.isEmpty() || !fotoList.contains(f)) {
             throw new BadRequestException("questo immobile non ha foto associate");
         }
-        fotoImmobileRepo.delete(f);
+        String str = f.getUrlFoto();
+        String[] strArray = str.substring(7).split("/");
+        String rawPubId = strArray[strArray.length - 1];
+        int ind = rawPubId.indexOf(".");
+        String pubId = rawPubId.substring(0, ind);
+
+        try {
+            Map<String, Object> params = new HashMap<>();
+            params.put("resource_type", "image");
+            Map res = imageUploader.uploader().destroy(pubId, params);
+            System.out.println(res);
+            fotoImmobileRepo.delete(f);
+
+        } catch (IOException ex) {
+            throw new BadRequestException("errore nell'eliminazione");
+        }
+
     }
 
 
