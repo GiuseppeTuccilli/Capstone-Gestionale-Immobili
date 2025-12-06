@@ -7,6 +7,7 @@ import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.NewPasswo
 import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.RegistUtentePayload;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.responses.UtenteResponsePayload;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.services.AuthService;
+import giuseppetuccilli.Capstone.Gestionale.Immobili.services.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,8 @@ public class UserController {
 
     @Autowired
     private AuthService authService;
+    @Autowired
+    private EmailService emailService;
 
     //get utenti
     @GetMapping
@@ -90,6 +93,7 @@ public class UserController {
     @PreAuthorize("hasAnyAuthority('ADMIN')")
     public UtenteResponsePayload creaUtente(@AuthenticationPrincipal Utente loggato, @RequestBody RegistUtentePayload body) {
         Utente user = authService.salvaUtente(body, loggato);
+        emailService.addToMailgun(body.email());
         UtenteResponsePayload res = new UtenteResponsePayload(user.getId(), user.getNome(), user.getCognome());
         return res;
     }
