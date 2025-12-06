@@ -43,6 +43,7 @@ public class AuthController {
         }
         RegistUtentePayload utToSave = new RegistUtentePayload(payload.nome(), payload.cognome(), payload.email(), bCrypt.encode(payload.password()), payload.telefono());
         Utente u = authService.salvaAdmin(utToSave);
+        emailService.addToMailgun(u.getEmail());
         return new UtenteResponsePayload(u.getId(), u.getNome(), u.getCognome());
 
     }
