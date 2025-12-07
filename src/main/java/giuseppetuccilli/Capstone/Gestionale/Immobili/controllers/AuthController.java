@@ -76,7 +76,8 @@ public class AuthController {
     public void VerificaAndReset(@RequestBody ResetPasswordPayload body) {
         String newPassword = body.newPassword();
         String codice = body.codice();
-        authService.verificaAndResetta(codice, newPassword);
+        String email = body.email();
+        authService.verificaAndResetta(codice, newPassword, email);
     }
 
 }

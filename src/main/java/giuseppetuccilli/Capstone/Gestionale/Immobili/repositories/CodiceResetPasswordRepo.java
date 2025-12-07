@@ -3,6 +3,7 @@ package giuseppetuccilli.Capstone.Gestionale.Immobili.repositories;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.CodiceResetPassword;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Utente;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -13,4 +14,7 @@ public interface CodiceResetPasswordRepo extends JpaRepository<CodiceResetPasswo
     List<CodiceResetPassword> findByUtente(Utente utente);
 
     List<CodiceResetPassword> findByCodice(String codice);
+
+    @Query("SELECT c FROM CodiceResetPassword c WHERE c.utente.email = :email")
+    List<CodiceResetPassword> findByemailUtente(String email);
 }

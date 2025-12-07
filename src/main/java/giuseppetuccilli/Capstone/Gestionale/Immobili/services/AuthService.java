@@ -118,6 +118,9 @@ public class AuthService {
     //cambio password
     public Utente cambiaPassword(NewPasswordPayload payload, long id) {
         Utente found = this.findById(id);
+        if (!bcrypt.matches(payload.oldPassword(), found.getPassword())) {
+            throw new BadRequestException("password errata");
+        }
         found.setPassword(bcrypt.encode(payload.password()));
         return utenteRepo.save(found);
 
@@ -180,7 +183,7 @@ public class AuthService {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime scadenza = now.plusHours(1);
 
-        CodiceResetPassword codResetPass = new CodiceResetPassword(codice, scadenza, u);
+        CodiceResetPassword codResetPass = new CodiceResetPassword(bcrypt.encode(codice), scadenza, u);
         codiceResetPasswordRepo.save(codResetPass);
 
         String mes = "il tuo codice per il reset della password è: " + codice;
@@ -190,13 +193,18 @@ public class AuthService {
     }
 
     //2) verifica codie e cambio password
-    public void verificaAndResetta(String codice, String newPassword) {
-        List<CodiceResetPassword> codici = codiceResetPasswordRepo.findByCodice(codice);
+    public void verificaAndResetta(String codice, String newPassword, String email) {
+
+        List<CodiceResetPassword> codici = codiceResetPasswordRepo.findByemailUtente(email);
         CodiceResetPassword codResPass;
         if (codici.isEmpty()) {
-            throw new BadRequestException("codice errato");
+            throw new BadRequestException("email non valida");
         } else {
             codResPass = codici.getFirst();
+        }
+
+        if (!bcrypt.matches(codice, codResPass.getCodice())) {
+            throw new BadRequestException("codice errato");
         }
 
         LocalDateTime now = LocalDateTime.now();
