@@ -1,6 +1,7 @@
 package giuseppetuccilli.Capstone.Gestionale.Immobili.runners;
 
 import giuseppetuccilli.Capstone.Gestionale.Immobili.importazione.CsvImportService;
+import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.RegistUtentePayload;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.*;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.services.AuthService;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.services.ClienteService;
@@ -40,6 +41,8 @@ public class runner implements CommandLineRunner {
     private UtenteRepo utenteRepo;
     @Autowired
     private AuthService authService;
+    @Autowired
+    private DittaRepo dittaRepo;
 
     @Override
     public void run(String... args) throws Exception {
@@ -54,6 +57,11 @@ public class runner implements CommandLineRunner {
         if (comRepo.findAll().isEmpty()) {
             importService.salvaComuni(comunePath);
             System.out.println("tutto bene comuni");
+        }
+
+        if (utenteRepo.findAll().isEmpty()) {
+            RegistUtentePayload u = new RegistUtentePayload("Mario", "Rossi", "mario@rossi.it", "12345678", "32132132132");
+            authService.salvaAdmin(u);
         }
 
 
