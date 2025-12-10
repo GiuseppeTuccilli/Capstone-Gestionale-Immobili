@@ -1,10 +1,7 @@
 package giuseppetuccilli.Capstone.Gestionale.Immobili.services;
 
 import giuseppetuccilli.Capstone.Gestionale.Immobili.configs.security.JWTTools;
-import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.CodiceResetPassword;
-import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Ditta;
-import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Utente;
-import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Visita;
+import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.*;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.enums.RuoliUtente;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.exceptions.BadRequestException;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.exceptions.NotFoundException;
@@ -26,6 +23,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -47,6 +45,10 @@ public class AuthService {
     private EmailService emailService;
     @Autowired
     private CodiceResetPasswordRepo codiceResetPasswordRepo;
+    @Autowired
+    private ImmobileService immobileService;
+    @Autowired
+    private ClienteService clienteService;
 
     public Utente findById(long id) {
         Optional<Utente> found = utenteRepo.findById(id);
@@ -79,7 +81,7 @@ public class AuthService {
             throw new BadRequestException("l'email " + payload.email() + " è già in uso");
         }
         Ditta d = admin.getDitta();
-        Utente utente = new Utente(payload.nome(), payload.cognome(), payload.email(), payload.password(), payload.telefono(), RuoliUtente.USER, d);
+        Utente utente = new Utente(payload.nome(), payload.cognome(), payload.email(), bcrypt.encode(payload.password()), payload.telefono(), RuoliUtente.USER, d);
         Utente u = utenteRepo.save(utente);
         return u;
     }
@@ -126,6 +128,46 @@ public class AuthService {
 
     }
 
+    //funzione cancella ditta
+    private void cancellaDitta(Ditta ditta) {
+        Optional<Ditta> found = dittaRepo.findById(ditta.getId());
+        Ditta d;
+        if (found.isPresent()) {
+            d = found.get();
+        } else {
+            throw new NotFoundException(ditta.getId());
+        }
+        List<Immobile> listImmobili = immobileService.findByDitta(d);
+        List<Cliente> listClienti = clienteService.findByDitta(d);
+        List<Utente> listUtenti = utenteRepo.findByDitta(d);
+        if (!listImmobili.isEmpty()) {
+            for (int i = 0; i < listImmobili.size(); i++) {
+                Immobile im = listImmobili.get(i);
+                immobileService.cancellaImmobile(im.getId(), d.getId());
+            }
+        }
+        if (!listClienti.isEmpty()) {
+            for (int i = 0; i < listClienti.size(); i++) {
+                Cliente c = listClienti.get(i);
+                clienteService.cancellaCliente(c.getId(), d.getId());
+            }
+        }
+        if (!listUtenti.isEmpty()) {
+            for (int i = 0; i < listUtenti.size(); i++) {
+                Utente u = listUtenti.get(i);
+                List<Visita> visite = visitaRepo.findByUtente(u);
+                if (!visite.isEmpty()) {
+                    for (int j = 0; j < visite.size(); j++) {
+                        visitaRepo.delete(visite.get(j));
+                    }
+                }
+                utenteRepo.delete(u);
+            }
+        }
+        dittaRepo.delete(d);
+
+    }
+
     //cancellazione utente
     public void cancellaUtente(long id) {
         Utente found = this.findById(id);
@@ -135,7 +177,25 @@ public class AuthService {
                 visitaRepo.delete(visite.get(i));
             }
         }
+        Ditta ditta = found.getDitta();
         utenteRepo.delete(found);
+
+        //se non ci sono più admin nella ditta, la cancello
+        List<Utente> listUtenti = utenteRepo.findByDitta(ditta);
+        if (listUtenti.isEmpty()) {
+            this.cancellaDitta(ditta);
+        } else {
+            List<Utente> listAdmin = new ArrayList<>();
+            for (int i = 0; i < listUtenti.size(); i++) {
+                Utente u = listUtenti.get(i);
+                if (u.getRuolo() == RuoliUtente.ADMIN) {
+                    listAdmin.add(u);
+                }
+            }
+            if (listAdmin.isEmpty()) {
+                this.cancellaDitta(ditta);
+            }
+        }
     }
 
     //reset password dimenticata

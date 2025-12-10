@@ -191,11 +191,16 @@ public class RichiestaService {
         return ric;
     }
 
-    public List<Richiesta> findRicCompatibili(long idImmobile) {
+    public List<Richiesta> findRicCompatibili(long idImmobile, Utente utente) {
         Optional<Immobile> imFound = immobileRepo.findById(idImmobile);
         if (!imFound.isPresent()) {
             throw new NotFoundException(idImmobile);
         }
+        Immobile im = imFound.get();
+        if (utente.getDitta().getId() != im.getDitta().getId()) {
+            throw new BadRequestException("non puoi accedere a questo immobile");
+        }
+
         List<Richiesta> foundList = incrocioRepo.findRichiesteCompatibili(idImmobile);
         return foundList;
     }

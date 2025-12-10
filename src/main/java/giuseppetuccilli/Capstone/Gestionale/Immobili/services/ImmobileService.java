@@ -145,6 +145,10 @@ public class ImmobileService {
         return this.immRepo.findAll(ImmobileSpecification.filtra(provincia, comune, indirizzo, tipo, idDitta), pageable);
     }
 
+    public List<Immobile> findByDitta(Ditta ditta) {
+        return immRepo.findByDitta(ditta);
+    }
+
     public Immobile salvaImmobile(NewImmoPayload payload, Ditta ditta) {
         MacroTipologiaImmobile macTipo;
         switch (payload.macroTipo().toLowerCase()) {

@@ -85,8 +85,8 @@ public class ImmobileController {
 
     //richieste compatibili immobile
     @GetMapping("/{id}/incroci")
-    public List<Richiesta> getRichCompatibili(@PathVariable long id) {
-        return richiestaService.findRicCompatibili(id);
+    public List<Richiesta> getRichCompatibili(@PathVariable long id, @AuthenticationPrincipal Utente loggato) {
+        return richiestaService.findRicCompatibili(id, loggato);
     }
 
     //aggiunta foto immobile

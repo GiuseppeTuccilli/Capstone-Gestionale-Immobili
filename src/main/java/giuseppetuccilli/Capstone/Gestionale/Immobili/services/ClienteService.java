@@ -53,6 +53,10 @@ public class ClienteService {
         return this.clienteRepo.findAll(ClienteSpecification.filtra(nome, cognome, idDitta), pageable);
     }
 
+    public List<Cliente> findByDitta(Ditta ditta) {
+        return clienteRepo.findByDitta(ditta);
+    }
+
     public Cliente salvaCliente(NewClientePayload payload, Utente u) {
         Cliente cliente = new Cliente(payload.nome(), payload.cognome(), payload.telefono(),
                 payload.indirizzo(), payload.email(), u.getDitta());
