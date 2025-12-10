@@ -63,7 +63,7 @@ public class AuthController {
 
     //reset della password dimenticata
     //1) invio codice per email
-    @GetMapping("/richiediCodice")
+    @PostMapping("/richiediCodice")
     @ResponseStatus(HttpStatus.CREATED)
     public void inviaCodice(@RequestBody EmailValidationPayload body) {
         String email = body.email();
