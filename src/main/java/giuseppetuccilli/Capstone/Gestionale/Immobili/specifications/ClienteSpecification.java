@@ -13,7 +13,7 @@ public class ClienteSpecification {
         return (root, query, cb) -> {
             Predicate predicate = cb.conjunction();
 
-            predicate = cb.and(predicate, cb.equal(root.get("utente").get("ditta").get("id"), idDitta));
+            predicate = cb.and(predicate, cb.equal(root.get("ditta").get("id"), idDitta));
 
             if (nome != null && !nome.isEmpty()) {
                 predicate = cb.and(predicate, cb.like(cb.lower(root.get("nome")), "%" + nome.toLowerCase() + "%"));

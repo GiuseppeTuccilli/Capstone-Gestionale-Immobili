@@ -45,7 +45,7 @@ public class RichiestaService {
     }
 
     public void salvaIncroci(Richiesta r) {
-        List<Immobile> immobili = immobileRepo.findByDitta(r.getCliente().getUtente().getDitta());
+        List<Immobile> immobili = immobileRepo.findByDitta(r.getCliente().getDitta());
         if (!immobili.isEmpty()) {
             for (int i = 0; i < immobili.size(); i++) {
                 Immobile imFromDb = immobili.get(i);

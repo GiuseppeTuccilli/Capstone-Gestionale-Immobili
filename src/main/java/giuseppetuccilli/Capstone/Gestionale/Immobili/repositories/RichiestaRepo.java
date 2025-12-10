@@ -14,6 +14,6 @@ import java.util.List;
 public interface RichiestaRepo extends JpaRepository<Richiesta, Long> {
     List<Richiesta> findByCliente(Cliente cliente);
 
-    @Query("SELECT r FROM Richiesta r WHERE r.cliente.utente.ditta = :ditta")
+    @Query("SELECT r FROM Richiesta r WHERE r.cliente.ditta = :ditta")
     List<Richiesta> findByDitta(@Param("ditta") Ditta ditta);
 }

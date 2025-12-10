@@ -33,7 +33,7 @@ public class ClienteService {
         Optional<Cliente> found = clienteRepo.findById(id);
         if (found.isPresent()) {
             Cliente c = found.get();
-            long dittaCliente = c.getUtente().getDitta().getId();
+            long dittaCliente = c.getDitta().getId();
             if (dittaCliente != idDitta) {
                 throw new BadRequestException("non puoi accedere a questo cliente");
             } else {
@@ -52,7 +52,7 @@ public class ClienteService {
 
     public Cliente salvaCliente(NewClientePayload payload, Utente u) {
         Cliente cliente = new Cliente(payload.nome(), payload.cognome(), payload.telefono(),
-                payload.indirizzo(), payload.email(), u);
+                payload.indirizzo(), payload.email(), u.getDitta());
 
         Cliente c = clienteRepo.save(cliente);
         return c;

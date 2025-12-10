@@ -35,6 +35,7 @@ public class ClienteController {
     @Autowired
     private VisitaService visitaService;
 
+    //crea cliente
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ClienteResDTO creaCliente(@RequestBody @Validated NewClientePayload body, BindingResult valRes, @AuthenticationPrincipal Utente loggato) {

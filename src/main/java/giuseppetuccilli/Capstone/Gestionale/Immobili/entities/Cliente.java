@@ -24,14 +24,14 @@ public class Cliente {
 
     @ManyToOne
     @JoinColumn(name = "id_utente")
-    private Utente utente;
+    private Ditta ditta;
 
-    public Cliente(String nome, String cognome, String telefono, String indirizzo, String email, Utente utente) {
+    public Cliente(String nome, String cognome, String telefono, String indirizzo, String email, Ditta ditta) {
         this.nome = nome;
         this.cognome = cognome;
         this.telefono = telefono;
         this.indirizzo = indirizzo;
         this.email = email;
-        this.utente = utente;
+        this.ditta = ditta;
     }
 }
