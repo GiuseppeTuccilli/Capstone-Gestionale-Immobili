@@ -1,6 +1,7 @@
 package giuseppetuccilli.Capstone.Gestionale.Immobili.controllers;
 
 import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Fattura;
+import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Utente;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.exceptions.ValidazioneFallitaExeption;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.NewFatturaPayload;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.responses.FatturaResDTO;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +27,7 @@ public class FatturaController {
     //nuova fattura
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public FatturaResDTO nuovaFattura(@RequestBody @Validated NewFatturaPayload body, BindingResult valRes) {
+    public FatturaResDTO nuovaFattura(@RequestBody @Validated NewFatturaPayload body, BindingResult valRes, @AuthenticationPrincipal Utente loggato) {
         if (valRes.hasErrors()) {
             List<String> errList = new ArrayList<>();
             for (int i = 0; i < valRes.getFieldErrors().size(); i++) {
@@ -33,7 +35,7 @@ public class FatturaController {
             }
             throw new ValidazioneFallitaExeption(errList);
         }
-        Fattura f = fatturaService.salvaFattura(body);
+        Fattura f = fatturaService.salvaFattura(body, loggato);
         return new FatturaResDTO(f.getNumero(), f.getCausale(), f.getImporto(), f.getData(), f.getCliente().getId());
     }
 

@@ -1,6 +1,7 @@
 package giuseppetuccilli.Capstone.Gestionale.Immobili.services;
 
 import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.*;
+import giuseppetuccilli.Capstone.Gestionale.Immobili.exceptions.BadRequestException;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.exceptions.NotFoundException;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.NewRichiestaPayload;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.*;
@@ -113,7 +114,7 @@ public class RichiestaService {
 
     }
 
-    public Richiesta salvaRichiesta(NewRichiestaPayload payload, long idCliente) {
+    public Richiesta salvaRichiesta(NewRichiestaPayload payload, long idCliente, Utente utente) {
         Optional<Cliente> clienteFound = clienteRepo.findById(idCliente);
         Cliente c;
         if (clienteFound.isPresent()) {
@@ -121,27 +122,10 @@ public class RichiestaService {
         } else {
             throw new NotFoundException(idCliente);
         }
-        /*
-        Comune com = null;
-        Provincia prov = null;
-        if (!payload.comune().equals("")) {
-            List<Comune> comList = comuneRepo.findByDenominazioneContainingIgnoreCase(payload.comune());
-            if (!comList.isEmpty()) {
-                com = comList.getFirst();
-                prov = com.getProvincia();
-            } else {
-                throw new BadRequestException("denominazione comune non valida");
-            }
+        if (utente.getDitta().getId() != c.getDitta().getId()) {
+            throw new BadRequestException("non puoi accedere a questo cliente");
         }
-        if (payload.comune().equals("") && !payload.provincia().equals("")) {
-            List<Provincia> provList = provinciaRepo.findByNomeProvinciaContainingIgnoreCase(payload.provincia());
-            if (!provList.isEmpty()) {
-                prov = provList.getFirst();
-            } else {
-                throw new BadRequestException("denominazione provincia non valida");
-            }
-        }
-                 */
+
         Richiesta ric = new Richiesta(payload.prezzoMassimo(), payload.superficieMinimo(),
                 payload.superficieMassimo(), payload.vaniMinimo(), payload.vaniMassimo(),
                 payload.localiMinimo(), payload.localiMassimo(), payload.cantina(), payload.ascensore(),
@@ -216,7 +200,7 @@ public class RichiestaService {
         return foundList;
     }
 
-    public List<Richiesta> findByCliente(long idCliente) {
+    public List<Richiesta> findByCliente(long idCliente, Utente utente) {
         Cliente c;
         Optional<Cliente> foundCliente = clienteRepo.findById(idCliente);
         if (foundCliente.isPresent()) {
@@ -224,6 +208,10 @@ public class RichiestaService {
         } else {
             throw new NotFoundException(idCliente);
         }
+        if (utente.getDitta().getId() != c.getDitta().getId()) {
+            throw new BadRequestException("non puoi accedere a questo cliente");
+        }
+
 
         List<Richiesta> foundList = richiestaRepo.findByCliente(c);
         return foundList;

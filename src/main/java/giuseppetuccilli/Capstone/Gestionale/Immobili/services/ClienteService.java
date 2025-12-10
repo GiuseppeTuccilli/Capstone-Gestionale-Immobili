@@ -6,6 +6,7 @@ import giuseppetuccilli.Capstone.Gestionale.Immobili.exceptions.NotFoundExceptio
 import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.NewClientePayload;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.ClienteRepo;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.FatturaRepo;
+import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.RichiestaRepo;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.VisitaRepo;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.specifications.ClienteSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,8 @@ public class ClienteService {
     private FatturaRepo fatturaRepo;
     @Autowired
     private VisitaRepo visitaRepo;
+    @Autowired
+    private RichiestaRepo richiestaRepo;
 
     public Cliente findById(long id, long idDitta) {
         Optional<Cliente> found = clienteRepo.findById(id);
@@ -74,7 +77,7 @@ public class ClienteService {
         Cliente found = this.findById(id, idDitta);
 
         //cancellazione richieste
-        List<Richiesta> richieste = richiestaService.findByCliente(found.getId());
+        List<Richiesta> richieste = richiestaRepo.findByCliente(found);
         if (!richieste.isEmpty()) {
             for (int i = 0; i < richieste.size(); i++) {
                 richiestaService.cancellaRichiesta(richieste.get(i).getId());

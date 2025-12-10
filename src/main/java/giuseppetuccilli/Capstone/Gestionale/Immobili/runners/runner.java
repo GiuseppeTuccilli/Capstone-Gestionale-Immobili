@@ -60,7 +60,7 @@ public class runner implements CommandLineRunner {
         }
 
         if (utenteRepo.findAll().isEmpty()) {
-            RegistUtentePayload u = new RegistUtentePayload("Mario", "Rossi", "mario@rossi.it", "12345678", "32132132132");
+            RegistUtentePayload u = new RegistUtentePayload("Mario", "Rossi", "mario@rossi.it", bCrypt.encode("12345678"), "32132132132");
             authService.salvaAdmin(u);
         }
 

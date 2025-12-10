@@ -128,10 +128,11 @@ public class ImmobileController {
     //visite immobile
     @GetMapping("/{id}/visite")
     public List<Visita> getVisiteImmobile(
-            @PathVariable long id
+            @PathVariable long id,
+            @AuthenticationPrincipal Utente loggato
 
     ) {
-        return visitaService.findByImmobile(id);
+        return visitaService.findByImmobile(id, loggato);
     }
 
 

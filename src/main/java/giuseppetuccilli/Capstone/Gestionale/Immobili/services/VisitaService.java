@@ -60,8 +60,8 @@ public class VisitaService {
         return this.visitaRepo.findAll(pageable);
     }
 
-    public List<Visita> findByImmobile(long idImmobile) {
-       
+    public List<Visita> findByImmobile(long idImmobile, Utente utente) {
+
         Optional<Immobile> found = immobileRepo.findById(idImmobile);
         Immobile i;
         if (found.isPresent()) {
@@ -69,10 +69,13 @@ public class VisitaService {
         } else {
             throw new NotFoundException(idImmobile);
         }
+        if (utente.getDitta().getId() != i.getDitta().getId()) {
+            throw new BadRequestException("non puoi accedere a questo immobile");
+        }
         return this.visitaRepo.findByImmobile(i);
     }
 
-    public List<Visita> findByCliente(long idCliente) {
+    public List<Visita> findByCliente(long idCliente, Utente utente) {
 
         Optional<Cliente> found = clienteRepo.findById(idCliente);
         Cliente c;
@@ -80,6 +83,9 @@ public class VisitaService {
             c = found.get();
         } else {
             throw new NotFoundException(idCliente);
+        }
+        if (utente.getDitta().getId() != c.getDitta().getId()) {
+            throw new BadRequestException("non puoi accedere a questo cliente");
         }
         return visitaRepo.findByCliente(c);
 
@@ -108,15 +114,6 @@ public class VisitaService {
             throw new NotFoundException(payload.idImmobile());
         }
 
-        //controllo che l'immobile non abbia una visita per quella data
-        List<Visita> visiteImm = visitaRepo.findByImmobile(immobile);
-        if (!visiteImm.isEmpty()) {
-            for (int i = 0; i < visiteImm.size(); i++) {
-                if (visiteImm.get(i).getData().equals(data)) {
-                    throw new BadRequestException("questo immobile ha già una visita per la data " + data.toString());
-                }
-            }
-        }
 
         Optional<Cliente> clFound = clienteRepo.findById(payload.idCliente());
         if (clFound.isPresent()) {
@@ -130,6 +127,24 @@ public class VisitaService {
             utente = utFound.get();
         } else {
             throw new NotFoundException(idUtente);
+        }
+
+        //controllo che l'immobile non abbia una visita per quella data
+        List<Visita> visiteImm = visitaRepo.findByImmobile(immobile);
+        if (!visiteImm.isEmpty()) {
+            for (int i = 0; i < visiteImm.size(); i++) {
+                if (visiteImm.get(i).getData().equals(data)) {
+                    throw new BadRequestException("questo immobile ha già una visita per la data " + data.toString());
+                }
+            }
+        }
+
+        if (utente.getDitta().getId() != cliente.getDitta().getId()) {
+            throw new BadRequestException("non puoi accedere a questo cliente");
+        }
+
+        if (utente.getDitta().getId() != immobile.getDitta().getId()) {
+            throw new BadRequestException("non puoi accedere a questo immobile");
         }
 
         Visita visita = new Visita(data, immobile, cliente, utente);

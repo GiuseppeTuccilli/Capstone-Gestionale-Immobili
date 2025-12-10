@@ -41,16 +41,7 @@ public class VisitaController {
     public List<Visita> getVisiteUtente(@AuthenticationPrincipal Utente utLoggato) {
         List<Visita> visite = visitaService.findByUtente(utLoggato.getId());
         return visite;
-        /*
-        List<VisitaResDTO> res = new ArrayList<>();
-        if (!visite.isEmpty()) {
-            for (int i = 0; i < visite.size(); i++) {
-                Visita v = visite.get(i);
-                VisitaResDTO resItem = new VisitaResDTO(v.getId(), v.getCliente().getId(), v.getImmobile().getId(), v.getData());
-                res.add(resItem);
-            }
-        }
-        return res;*/
+       
     }
 
     @DeleteMapping("/mieVisite/{id}")

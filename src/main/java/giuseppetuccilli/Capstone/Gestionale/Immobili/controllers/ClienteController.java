@@ -73,6 +73,7 @@ public class ClienteController {
         return clienteService.findById(id, d.getId());
     }
 
+    //modifica cliente
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('ADMIN')")
     public ClienteResDTO modificaCliente(@RequestBody @Validated NewClientePayload body, BindingResult valRes, @PathVariable long id, @AuthenticationPrincipal Utente loggato) {
@@ -99,7 +100,7 @@ public class ClienteController {
     //nuova richiesta
     @PostMapping("/{id}/richieste")
     @ResponseStatus(HttpStatus.CREATED)
-    public RichiestaResDTO nuovaRichiesta(@RequestBody @Validated NewRichiestaPayload body, BindingResult valRes, @PathVariable long id) {
+    public RichiestaResDTO nuovaRichiesta(@RequestBody @Validated NewRichiestaPayload body, BindingResult valRes, @PathVariable long id, @AuthenticationPrincipal Utente loggato) {
         if (valRes.hasErrors()) {
             List<String> errList = new ArrayList<>();
             for (int i = 0; i < valRes.getFieldErrors().size(); i++) {
@@ -107,7 +108,7 @@ public class ClienteController {
             }
             throw new ValidazioneFallitaExeption(errList);
         }
-        Richiesta r = richiestaService.salvaRichiesta(body, id);
+        Richiesta r = richiestaService.salvaRichiesta(body, id, loggato);
         return new RichiestaResDTO(r.getId(), r.getPrezzoMassimo(), r.getSuperficieMinimo(),
                 r.getSuperficieMassimo(), r.getVaniMinimo(), r.getVaniMassimo(), r.getLocaliMinimo(),
                 r.getLocaliMassimo(), r.getComune(), r.getProvincia(), r.isCantina(), r.isAscensore(),
@@ -117,9 +118,9 @@ public class ClienteController {
 
     //get richieste per cliente
     @GetMapping("/{id}/richieste")
-    public List<RichiestaResDTO> getRichieste(@PathVariable long id) {
+    public List<RichiestaResDTO> getRichieste(@PathVariable long id, @AuthenticationPrincipal Utente loggato) {
         List<RichiestaResDTO> res = new ArrayList<>();
-        List<Richiesta> ricList = richiestaService.findByCliente(id);
+        List<Richiesta> ricList = richiestaService.findByCliente(id, loggato);
         for (int i = 0; i < ricList.size(); i++) {
             Richiesta r = ricList.get(i);
             RichiestaResDTO resItem = new RichiestaResDTO(r.getId(), r.getPrezzoMassimo(), r.getSuperficieMinimo(),
@@ -133,9 +134,9 @@ public class ClienteController {
 
     //get fatture cliente
     @GetMapping("/{id}/fatture")
-    public List<FatturaResDTO> getFatture(@PathVariable long id) {
+    public List<FatturaResDTO> getFatture(@PathVariable long id, @AuthenticationPrincipal Utente loggato) {
         List<FatturaResDTO> res = new ArrayList<>();
-        List<Fattura> fatList = fatturaService.findByCliente(id);
+        List<Fattura> fatList = fatturaService.findByCliente(id, loggato);
         if (!fatList.isEmpty()) {
             for (int i = 0; i < fatList.size(); i++) {
                 Fattura f = fatList.get(i);
@@ -150,10 +151,11 @@ public class ClienteController {
     @GetMapping("/{id}/visite")
 
     public List<Visita> getVisiteCliente(
-            @PathVariable long id
+            @PathVariable long id,
+            @AuthenticationPrincipal Utente loggato
 
     ) {
-        return visitaService.findByCliente(id);
+        return visitaService.findByCliente(id, loggato);
     }
 
 

@@ -2,6 +2,7 @@ package giuseppetuccilli.Capstone.Gestionale.Immobili.services;
 
 import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Cliente;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Fattura;
+import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Utente;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.exceptions.BadRequestException;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.exceptions.NotFoundException;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.NewFatturaPayload;
@@ -62,7 +63,7 @@ public class FatturaService {
         }
     }
 
-    public Fattura salvaFattura(NewFatturaPayload payload) {
+    public Fattura salvaFattura(NewFatturaPayload payload, Utente utente) {
         Cliente c;
         LocalDate data = getData(payload.data());
         Optional<Cliente> clFound = clienteRepo.findById(payload.idCliente());
@@ -70,6 +71,9 @@ public class FatturaService {
             c = clFound.get();
         } else {
             throw new NotFoundException(payload.idCliente());
+        }
+        if (utente.getDitta().getId() != c.getDitta().getId()) {
+            throw new BadRequestException("non puoi accedere a questo cliente");
         }
         Fattura fattura = new Fattura(payload.importo(), c, payload.causale(), data);
         Fattura f = fatturaRepo.save(fattura);
@@ -81,13 +85,16 @@ public class FatturaService {
         fatturaRepo.delete(found);
     }
 
-    public List<Fattura> findByCliente(long idCliente) {
+    public List<Fattura> findByCliente(long idCliente, Utente utente) {
         Optional<Cliente> foundCli = clienteRepo.findById(idCliente);
         Cliente c;
         if (foundCli.isPresent()) {
             c = foundCli.get();
         } else {
             throw new BadRequestException("cliente con id " + idCliente + " non presente nel database");
+        }
+        if (utente.getDitta().getId() != c.getDitta().getId()) {
+            throw new BadRequestException("non puoi accedre a questo cliente");
         }
         List<Fattura> foundList = fatturaRepo.findByCliente(c);
         return foundList;
