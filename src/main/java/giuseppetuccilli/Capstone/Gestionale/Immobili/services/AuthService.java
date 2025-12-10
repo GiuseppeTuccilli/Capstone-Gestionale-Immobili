@@ -159,6 +159,12 @@ public class AuthService {
                         visitaRepo.delete(visite.get(j));
                     }
                 }
+                List<CodiceResetPassword> codici = codiceResetPasswordRepo.findByUtente(u);
+                if (!codici.isEmpty()) {
+                    for (int j = 0; j < codici.size(); j++) {
+                        codiceResetPasswordRepo.delete(codici.get(j));
+                    }
+                }
                 utenteRepo.delete(u);
             }
         }
@@ -175,6 +181,13 @@ public class AuthService {
                 visitaRepo.delete(visite.get(i));
             }
         }
+        List<CodiceResetPassword> codici = codiceResetPasswordRepo.findByUtente(found);
+        if (!codici.isEmpty()) {
+            for (int i = 0; i < codici.size(); i++) {
+                codiceResetPasswordRepo.delete(codici.get(i));
+            }
+        }
+
         Ditta ditta = found.getDitta();
         utenteRepo.delete(found);
 
