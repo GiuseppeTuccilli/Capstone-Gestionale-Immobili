@@ -3,6 +3,8 @@ package giuseppetuccilli.Capstone.Gestionale.Immobili.controllers;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Ditta;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.entities.Utente;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.exceptions.ValidazioneFallitaExeption;
+import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.ChangeEmailPayload;
+import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.EditProfilePayload;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.NewPasswordPayload;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.RegistUtentePayload;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.responses.UtenteResponsePayload;
@@ -98,5 +100,16 @@ public class UserController {
         return res;
     }
 
+    //cambio email
+    @PatchMapping("/me/email")
+    public Utente cambiaEmail(@RequestBody ChangeEmailPayload body, @AuthenticationPrincipal Utente loggato) {
+        return authService.cambiaEmail(body, loggato);
+    }
+
+    //modifica profilo (nome, cognome, telefono)
+    @PutMapping("/me")
+    public Utente Modificaprofilo(@RequestBody EditProfilePayload body, @AuthenticationPrincipal Utente loggato) {
+        return authService.modificaProfilo(body, loggato);
+    }
 
 }

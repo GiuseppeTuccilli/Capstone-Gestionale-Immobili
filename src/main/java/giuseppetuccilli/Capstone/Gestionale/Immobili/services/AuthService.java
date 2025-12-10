@@ -6,9 +6,7 @@ import giuseppetuccilli.Capstone.Gestionale.Immobili.enums.RuoliUtente;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.exceptions.BadRequestException;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.exceptions.NotFoundException;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.exceptions.UnauthorizedException;
-import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.LoginRequest;
-import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.NewPasswordPayload;
-import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.RegistUtentePayload;
+import giuseppetuccilli.Capstone.Gestionale.Immobili.payloads.requests.*;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.CodiceResetPasswordRepo;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.DittaRepo;
 import giuseppetuccilli.Capstone.Gestionale.Immobili.repositories.UtenteRepo;
@@ -278,5 +276,29 @@ public class AuthService {
         codiceResetPasswordRepo.delete(codResPass);
     }
 
+    //cambio email
+    public Utente cambiaEmail(ChangeEmailPayload payload, Utente utente) {
+        Utente u = this.findById(utente.getId());
+        if (u.getEmail().equals(payload.newEmail())) {
+            return u;
+        }
+        Optional<Utente> found = utenteRepo.findByEmail(payload.newEmail());
+        if (found.isPresent()) {
+            throw new BadRequestException("l'email " + payload.newEmail() + " è già presente nel database");
+        }
+        u.setEmail(payload.newEmail());
+        Utente res = utenteRepo.save(u);
+        return res;
+    }
+
+    //modifica nome, cognome, telefono
+    public Utente modificaProfilo(EditProfilePayload payload, Utente utente) {
+        Utente u = this.findById(utente.getId());
+        u.setNome(payload.newNome());
+        u.setCognome((payload.newCognome()));
+        u.setTelefono(payload.newTelefono());
+        Utente res = utenteRepo.save(u);
+        return res;
+    }
 
 }
