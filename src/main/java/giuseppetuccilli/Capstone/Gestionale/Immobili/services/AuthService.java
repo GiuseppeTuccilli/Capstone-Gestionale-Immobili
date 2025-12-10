@@ -288,6 +288,7 @@ public class AuthService {
         }
         u.setEmail(payload.newEmail());
         Utente res = utenteRepo.save(u);
+        emailService.addToMailgun(u.getEmail());
         return res;
     }
 
