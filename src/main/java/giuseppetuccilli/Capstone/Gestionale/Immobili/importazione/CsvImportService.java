@@ -102,7 +102,7 @@ public class CsvImportService {
                 }
                 String nomeProv = nextLine[0].split(";")[3];
 
-                //Optional<Provincia> foundProv = provinciaRepo.findById(nomeProv);
+                
                 List<Provincia> proLis = provinciaRepo.findByNomeProvinciaContainingIgnoreCase(nomeProv);
                 if (!proLis.isEmpty()) {
                     Provincia prov = proLis.getFirst();

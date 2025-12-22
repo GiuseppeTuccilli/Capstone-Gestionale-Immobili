@@ -146,29 +146,7 @@ public class RichiestaService {
                 incrocioRepo.delete(incroci.get(i));
             }
         }
-        /*
-        Comune com = null;
-        Provincia prov = null;
-        if (!payload.comune().equals("")) {
-            List<Comune> comList = comuneRepo.findByDenominazioneContainingIgnoreCase(payload.comune());
-
-            if (!comList.isEmpty()) {
-                com = comList.getFirst();
-                prov = com.getProvincia();
-            } else {
-                throw new BadRequestException("denominazione comune non valida");
-            }
-        }
-        if (payload.comune().equals("") && !payload.provincia().equals("")) {
-            List<Provincia> provList = provinciaRepo.findByNomeProvinciaContainingIgnoreCase(payload.provincia());
-            if (!provList.isEmpty()) {
-                prov = provList.getFirst();
-            } else {
-                throw new BadRequestException("denominazione provincia non valida");
-            }
-        }
-
-         */
+      
 
         found.setPrezzoMassimo(payload.prezzoMassimo());
         found.setSuperficieMassimo(payload.superficieMassimo());
